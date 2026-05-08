@@ -7,7 +7,7 @@
 <style>
   main { max-width: 100%; padding: 0; }
 
-  /* Shared landing tones — section edges match for seamless color handoff */
+  /* Shared landing tones for seamless section handoff */
   .land-home {
     --land-cream: #fdf7f0;
     --land-blush: #ffd8e8;
@@ -80,7 +80,18 @@
     letter-spacing: -0.03em;
     margin: 0 0 0.25rem;
   }
-  .hero h1 .line-2 { display: block; margin-top: 0.08em; color: var(--p-accent); }
+  .hero h1 .line-2 {
+    display: block;
+    margin-top: 0.08em;
+    color: var(--p-accent);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: clamp(2.8rem, 9vw, 5.8rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.94;
+    text-transform: none;
+    text-shadow: 0 3px 12px rgba(132, 94, 194, 0.16);
+  }
   .hero-lead {
     font-size: 1.05rem;
     line-height: 1.65;
@@ -363,7 +374,7 @@
   <div class="features-inner">
   <div class="features-header">
     <h2>Everything in one place</h2>
-    <p>Measurements, production updates, and delivery—without chasing calls or texts.</p>
+    <p>Measurements, production updates, and delivery without chasing calls or texts.</p>
   </div>
   <div class="features-grid">
     <div class="feature-card">
@@ -421,7 +432,7 @@
 <div class="cta-banner">
   <div class="cta-inner">
     <h2>Ready when you are</h2>
-    <p>Alterations, one-off pieces, and full custom — documented from first cut to final press.</p>
+    <p>Alterations, one-off pieces, and full custom, documented from first cut to final press.</p>
     <a href="{% url 'portal_book' %}" class="btn-cta">Book a garment</a>
   </div>
 </div>
