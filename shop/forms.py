@@ -3,8 +3,7 @@ from django.utils import timezone
 from .models import (
     Customer, CustomerOrder, OrderItem, Measurement,
     WorkTicket, TaskAssignment, TicketStatusHistory,
-    DamageIncident, Payment, Delivery, Employee,
-    Material, OrderItemMaterial
+    DamageIncident, Payment, Delivery, Employee
 )
 
 
@@ -171,40 +170,3 @@ class DeliveryForm(forms.ModelForm):
             'received_by': forms.TextInput(attrs={'class': 'form-control'}),
             'comments': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
-
-
-class MaterialForm(forms.ModelForm):
-    """Add or edit a material in the catalog."""
-    class Meta:
-        model = Material
-        fields = ['name', 'category', 'color', 'default_unit', 'supplier',
-                  'unit_cost', 'is_active', 'notes']
-        widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Italian Wool'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
-            'color': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Navy Blue'}),
-            'default_unit': forms.Select(attrs={'class': 'form-select'}),
-            'supplier': forms.TextInput(attrs={'class': 'form-control'}),
-            'unit_cost': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
-        }
-
-
-class OrderItemMaterialForm(forms.ModelForm):
-    """Record how much of a material was used for a specific order item."""
-    class Meta:
-        model = OrderItemMaterial
-        fields = ['material', 'quantity', 'unit', 'color_override', 'notes']
-        widgets = {
-            'material': forms.Select(attrs={'class': 'form-select'}),
-            'quantity': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0.01'}),
-            'unit': forms.Select(attrs={'class': 'form-select'}),
-            'color_override': forms.TextInput(attrs={'class': 'form-control',
-                                                      'placeholder': 'Leave blank to use catalog color'}),
-            'notes': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['material'].queryset = Material.objects.filter(is_active=True)
-        self.fields['material'].empty_label = 'Select a material'

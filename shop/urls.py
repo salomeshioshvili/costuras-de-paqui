@@ -23,13 +23,6 @@ urlpatterns = [
     path('orders/<int:order_pk>/items/add/', views.orderitem_create, name='orderitem_create'),
     path('items/<int:pk>/edit/', views.orderitem_edit, name='orderitem_edit'),
     path('items/<int:item_pk>/measurements/add/', views.measurement_add, name='measurement_add'),
-    path('items/<int:item_pk>/materials/add/', views.orderitem_material_add, name='orderitem_material_add'),
-    path('item-materials/<int:pk>/remove/', views.orderitem_material_remove, name='orderitem_material_remove'),
-
-    # Material catalog
-    path('materials/', views.material_list, name='material_list'),
-    path('materials/new/', views.material_create, name='material_create'),
-    path('materials/<int:pk>/edit/', views.material_edit, name='material_edit'),
 
     # Work Tickets
     path('tickets/', views.ticket_list, name='ticket_list'),
