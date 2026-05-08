@@ -1004,7 +1004,7 @@ def emp_my_tickets(request, employee):
 def emp_all_tickets(request, employee):
     tickets = WorkTicket.objects.select_related(
         'current_stage', 'order_item__order__customer'
-    ).prefetch_related('task_assignments__employee')
+    ).prefetch_related('assignments__employee')
     status_filter = request.GET.get('status')
     priority_filter = request.GET.get('priority')
     if status_filter:

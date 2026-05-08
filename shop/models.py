@@ -71,7 +71,7 @@ class Employee(models.Model):
 
     @property
     def current_assignments(self):
-        return self.taskassignment_set.filter(assignment_status='current').count()
+        return self.task_assignments.filter(assignment_status='current').count()
 
 
 class EmployeeAvailability(models.Model):
