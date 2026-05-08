@@ -1,62 +1,100 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Login | StitchPro</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>Team sign in · Costuras de Paqui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="{% static 'css/costuras.css' %}" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --bg:#0f1117;--surface:#1a1d27;--border:#2e3347;--accent:#4f8ef7;--text:#e8eaf0;--muted:#6b7280;--red:#ef4444; }
-    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; }
-    .box { width:100%; max-width:400px; padding:2rem; }
-    .brand { text-align:center; margin-bottom:2rem; }
-    .brand-dot { width:12px;height:12px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;vertical-align:middle; }
-    .brand h1 { font-size:1.5rem; font-weight:700; display:inline; }
-    .brand p { color:var(--muted); font-size:0.85rem; margin-top:0.4rem; }
-    .card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:2rem; }
-    .card h2 { font-size:1.1rem; font-weight:600; margin-bottom:0.25rem; }
-    .card p { color:var(--muted); font-size:0.85rem; margin-bottom:1.5rem; }
-    .form-group { margin-bottom:1rem; }
-    label { display:block; font-size:0.73rem; font-weight:600; letter-spacing:0.08em; color:var(--muted); margin-bottom:0.35rem; }
-    input { width:100%; padding:0.65rem 0.9rem; background:#22263a; border:1px solid var(--border); border-radius:7px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.15s; }
-    input:focus { border-color:var(--accent); }
-    .btn { width:100%; padding:0.7rem; background:var(--accent); color:#fff; border:none; border-radius:7px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; cursor:pointer; margin-top:0.5rem; transition:background 0.15s; }
-    .btn:hover { background:#3a7ce8; }
-    .error { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:0.7rem 1rem; border-radius:7px; font-size:0.85rem; margin-bottom:1rem; }
-    .links { text-align:center; margin-top:1.25rem; font-size:0.82rem; color:var(--muted); }
-    .links a { color:var(--accent); text-decoration:none; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: linear-gradient(160deg, #efe6ff 0%, #f7f4ef 45%, #e8f2fc 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .box { width: 100%; max-width: 420px; }
+    .brand { text-align: center; margin-bottom: 1.5rem; }
+    .brand img { width: 64px; height: 64px; object-fit: contain; border-radius: 16px; border: 1px solid #e8e0f5; background: #fff; padding: 4px; margin-bottom: 0.75rem; }
+    .brand h1 { font-size: 1.35rem; font-weight: 800; color: #1e1b2e; letter-spacing: -0.02em; }
+    .brand .sub { color: #6b6580; font-size: 0.88rem; font-weight: 600; margin-top: 0.35rem; }
+    .card {
+      background: #fff;
+      border: 1px solid #e8e0f5;
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 24px 64px rgba(132,94,194,0.14);
+    }
+    .card h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 0.2rem; color: #1e1b2e; }
+    .card .lead { color: #6b6580; font-size: 0.875rem; font-weight: 600; margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: #6b6580; margin-bottom: 0.35rem; }
+    input {
+      width: 100%;
+      padding: 0.72rem 1rem;
+      border: 1.5px solid #e8e0f5;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      background: #fffcf8;
+    }
+    input:focus { outline: none; border-color: #845ec2; box-shadow: 0 0 0 3px rgba(132,94,194,0.15); background: #fff; }
+    .btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: #845ec2;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .btn:hover { filter: brightness(1.06); }
+    .error { background: #fdf2f4; border: 1px solid #f5c2cb; color: #9b2943; padding: 0.75rem 1rem; border-radius: 14px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem; }
+    .links { text-align: center; margin-top: 1.25rem; font-size: 0.85rem; font-weight: 600; color: #6b6580; }
+    .links a { color: #845ec2; text-decoration: none; }
+    .login-legal { text-align: center; margin-top: 1.5rem; font-size: 12px; font-weight: 700; color: #8878a8; }
   </style>
 </head>
 <body>
 <div class="box">
   <div class="brand">
-    <span class="brand-dot"></span>
-    <h1>StitchPro</h1>
-    <p>Staff Portal, Employee Access</p>
+    <img src="{% static 'branding/logo.png' %}" alt="Costuras de Paqui">
+    <h1>Costuras de Paqui</h1>
+    <p class="sub">Team portal</p>
   </div>
   <div class="card">
-    <h2>Sign in to Staff Portal</h2>
-    <p>Enter your work email and password</p>
+    <h2>Sign in</h2>
+    <p class="lead">Use the <strong>email</strong> or <strong>username</strong> on your Django user, plus your password. Your account must be linked to an Employee in admin.</p>
     {% if error %}<div class="error">{{ error }}</div>{% endif %}
     <form method="post">
       {% csrf_token %}
       <div class="form-group">
-        <label>Work Email</label>
-        <input type="email" name="email" value="{{ email|default:'' }}" placeholder="you@stitchpro.com" required autofocus>
+        <label>Email or log in username</label>
+        <input type="text" name="email" value="{{ email|default:'' }}" placeholder="you@example.com" required autofocus autocomplete="username">
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input type="password" name="password" placeholder="Your password" required>
+        <input type="password" name="password" placeholder="••••••••" required>
       </div>
-      <button type="submit" class="btn">Sign in</button>
+      <button type="submit" class="btn">Sign in →</button>
     </form>
   </div>
   <div class="links">
-    <a href="{% url 'portal_home' %}">Back to the customer site</a>
+    <a href="{% url 'portal_home' %}">← Customer site</a>
     &nbsp;·&nbsp;
-    <a href="{% url 'login' %}">Admin login</a>
+    <a href="{% url 'login' %}">Django admin login</a>
   </div>
+  <p class="login-legal">© {% now "Y" %} Costuras de Paqui</p>
 </div>
 </body>
 </html>

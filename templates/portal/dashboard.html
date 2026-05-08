@@ -3,63 +3,87 @@
 
 {% block extra_css %}
 <style>
-  .welcome { margin-bottom: 2rem; }
-  .welcome h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.25rem; }
-  .welcome p { color: var(--muted); }
-  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-  .stat-box {
+  .cust-dash { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 1.5rem; align-items: start; }
+  @media (max-width: 991px) { .cust-dash { grid-template-columns: 1fr; } }
+  .cust-rail {
     background: #fff;
-    border: 1px solid var(--border);
-    padding: 1.5rem;
-    border-radius: 2px;
-    text-align: center;
+    border: 1px solid var(--p-border);
+    border-radius: 22px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
   }
-  .stat-num { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold); }
-  .stat-label { font-size: 0.78rem; letter-spacing: 0.08em; color: var(--muted); margin-top: 0.25rem; }
-  .section-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 1rem; }
-  .order-row { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem; }
+  .cust-rail h3 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--p-muted);
+    margin: 0 0 1rem;
+  }
+  .cust-rail-item {
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--p-border);
+    font-size: 0.85rem;
+  }
+  .cust-rail-item:last-child { border-bottom: none; }
+  .cust-rail-item__d { font-size: 0.7rem; font-weight: 800; color: var(--p-accent); text-transform: uppercase; }
+  .cust-rail-item__t { font-weight: 700; margin-top: 2px; }
+  .order-row { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--p-border); flex-wrap: wrap; gap: 0.5rem; }
   .order-row:last-child { border-bottom: none; }
   .order-id { font-weight: 600; font-size: 0.9rem; }
-  .order-meta { color: var(--muted); font-size: 0.82rem; }
-  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
-  .empty-state .icon { font-size: 2.5rem; margin-bottom: 1rem; }
-  .empty-state h3 { font-family: 'Playfair Display', serif; color: var(--dark); margin-bottom: 0.5rem; }
+  .order-meta { color: var(--p-muted); font-size: 0.82rem; }
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--p-muted); }
+  .empty-state .empty-ico { font-size: 2.75rem; margin-bottom: 1rem; color: var(--p-accent); opacity: 0.35; }
+  .empty-state h3 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 800;
+    color: var(--p-ink);
+    margin-bottom: 0.5rem;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+  }
   .empty-state p { font-size: 0.9rem; margin-bottom: 1.5rem; }
-  .due-soon { color: #856404; font-size: 0.78rem; font-weight: 600; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="welcome">
-  <h1>Hello, {{ customer.first_name }} ✦</h1>
-  <p>Track your garments, place new orders, and manage your account.</p>
+<div class="cust-dash">
+<div>
+<div class="cdp-dash-intro">
+  <h1>Hello, {{ customer.first_name }}</h1>
+  <p>Your orders and bookings, clearly laid out.</p>
+  <p class="text-secondary small mb-0" style="font-size:0.82rem;color:var(--p-muted) !important;">{% now "l, F j" %}</p>
 </div>
 
-<!-- STATS -->
-<div class="stats-row">
-  <div class="stat-box">
-    <div class="stat-num">{{ active_orders.count }}</div>
-    <div class="stat-label">Active Orders</div>
+<div class="cdp-metric-grid">
+  <div class="cdp-metric-card cdp-metric-card--lemon">
+    <i class="cdp-metric-card__icon bi bi-hourglass-split" aria-hidden="true"></i>
+    <div class="cdp-metric-card__label">Active orders</div>
+    <div class="cdp-metric-card__value">{{ active_orders.count }}</div>
+    <div class="cdp-metric-card__hint">With the workshop</div>
   </div>
-  <div class="stat-box">
-    <div class="stat-num">{{ completed_orders.count }}</div>
-    <div class="stat-label">Completed</div>
+  <div class="cdp-metric-card cdp-metric-card--mint">
+    <i class="cdp-metric-card__icon bi bi-check2-circle" aria-hidden="true"></i>
+    <div class="cdp-metric-card__label">Completed</div>
+    <div class="cdp-metric-card__value">{{ completed_orders.count }}</div>
+    <div class="cdp-metric-card__hint">Delivered or closed</div>
   </div>
-  <div class="stat-box">
-    <div class="stat-num">{{ active_orders.count|add:completed_orders.count }}</div>
-    <div class="stat-label">Total Orders</div>
+  <div class="cdp-metric-card cdp-metric-card--sky">
+    <i class="cdp-metric-card__icon bi bi-stack" aria-hidden="true"></i>
+    <div class="cdp-metric-card__label">All orders</div>
+    <div class="cdp-metric-card__value">{{ active_orders.count|add:completed_orders.count }}</div>
+    <div class="cdp-metric-card__hint">Lifetime total</div>
   </div>
 </div>
 
-<!-- QUICK ACTION -->
 <div style="margin-bottom:2rem;">
-  <a href="{% url 'portal_book' %}" class="btn btn-primary">✦ Book New Garment</a>
+  <a href="{% url 'portal_book' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Book a garment</a>
 </div>
 
 <!-- ACTIVE ORDERS -->
 <div class="card">
   <div class="card-header">
-    <span class="card-title">Active Orders</span>
+    <span class="card-title">Active orders</span>
   </div>
   {% if active_orders %}
     {% for order in active_orders %}
@@ -77,16 +101,16 @@
       </div>
       <div style="display:flex;align-items:center;gap:1rem;">
         <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
-        <a href="{% url 'portal_order_detail' order.pk %}" class="btn btn-outline btn-sm">View</a>
+        <a href="{% url 'portal_order_detail' order.pk %}" class="btn btn-outline btn-sm">View <i class="bi bi-arrow-right-short" style="vertical-align:-0.1em" aria-hidden="true"></i></a>
       </div>
     </div>
     {% endfor %}
   {% else %}
     <div class="empty-state">
-      <div class="icon">🧵</div>
+      <div class="empty-ico"><i class="bi bi-inbox" aria-hidden="true"></i></div>
       <h3>No active orders</h3>
-      <p>Start by booking your first custom garment.</p>
-      <a href="{% url 'portal_book' %}" class="btn btn-primary">Book Now</a>
+      <p>Book your first garment to see it here.</p>
+      <a href="{% url 'portal_book' %}" class="btn btn-primary">Book now</a>
     </div>
   {% endif %}
 </div>
@@ -95,7 +119,7 @@
 {% if completed_orders %}
 <div class="card">
   <div class="card-header">
-    <span class="card-title">Completed & Delivered</span>
+    <span class="card-title">Completed &amp; delivered</span>
   </div>
   {% for order in completed_orders %}
   <div class="order-row">
@@ -108,10 +132,26 @@
     </div>
     <div style="display:flex;align-items:center;gap:1rem;">
       <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
-      <a href="{% url 'portal_order_detail' order.pk %}" class="btn btn-outline btn-sm">View</a>
+      <a href="{% url 'portal_order_detail' order.pk %}" class="btn btn-outline btn-sm">View <i class="bi bi-arrow-right-short" style="vertical-align:-0.1em" aria-hidden="true"></i></a>
     </div>
   </div>
   {% endfor %}
 </div>
 {% endif %}
+</div>
+<aside class="cust-rail">
+  <h3>Upcoming due dates</h3>
+  {% if upcoming_orders %}
+    {% for order in upcoming_orders %}
+    <div class="cust-rail-item">
+      <div class="cust-rail-item__d">{{ order.due_date|date:"M j, Y" }}</div>
+      <div class="cust-rail-item__t"><a href="{% url 'portal_order_detail' order.pk %}" style="color:inherit;text-decoration:none;">Order #{{ order.pk }}</a></div>
+      <div class="order-meta">{{ order.get_status_display }}</div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="small text-muted mb-0">No due dates on active orders.</p>
+  {% endif %}
+</aside>
+</div>
 {% endblock %}

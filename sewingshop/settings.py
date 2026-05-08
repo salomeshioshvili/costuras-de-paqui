@@ -30,13 +30,14 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
 
     # Project app
-    'shop',
+    'shop.apps.ShopConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -109,11 +110,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-# Only declare the project-level static dir if it actually exists so that
-# missing folder doesn't break collectstatic in fresh checkouts.
-if (BASE_DIR / 'static').is_dir():
-    STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
@@ -127,8 +125,8 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 # ─── Django Unfold Configuration ──────────────────────────────────────────────
 UNFOLD = {
-    "SITE_TITLE": "Sewing Shop Management",
-    "SITE_HEADER": "Sewing Shop",
+    "SITE_TITLE": "Costuras de Paqui — Admin",
+    "SITE_HEADER": "Costuras de Paqui",
     "SITE_SYMBOL": "content_cut",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
@@ -171,12 +169,12 @@ UNFOLD = {
                         "link": "/admin/shop/customerorder/",
                     },
                     {
-                        "title": "Order Items",
+                        "title": "Order lines",
                         "icon": "checkroom",
                         "link": "/admin/shop/orderitem/",
                     },
                     {
-                        "title": "Work Tickets",
+                        "title": "Work tickets",
                         "icon": "receipt_long",
                         "link": "/admin/shop/workticket/",
                     },
@@ -187,45 +185,29 @@ UNFOLD = {
                 "separator": True,
                 "items": [
                     {
-                        "title": "Production Stages",
+                        "title": "Stages",
                         "icon": "account_tree",
                         "link": "/admin/shop/productionstage/",
                     },
                     {
-                        "title": "Task Assignments",
+                        "title": "Assignments",
                         "icon": "assignment_ind",
                         "link": "/admin/shop/taskassignment/",
                     },
                     {
-                        "title": "Status History",
+                        "title": "Stage history",
                         "icon": "history",
                         "link": "/admin/shop/ticketstatushistory/",
                     },
                     {
-                        "title": "Damage Incidents",
+                        "title": "Incidents",
                         "icon": "report_problem",
                         "link": "/admin/shop/damageincident/",
                     },
                 ],
             },
             {
-                "title": "Materials",
-                "separator": True,
-                "items": [
-                    {
-                        "title": "Material Catalog",
-                        "icon": "inventory_2",
-                        "link": "/admin/shop/material/",
-                    },
-                    {
-                        "title": "Per-Garment Usage",
-                        "icon": "scale",
-                        "link": "/admin/shop/orderitemmaterial/",
-                    },
-                ],
-            },
-            {
-                "title": "Finance & Delivery",
+                "title": "Payments & delivery",
                 "separator": True,
                 "items": [
                     {
@@ -241,7 +223,7 @@ UNFOLD = {
                 ],
             },
             {
-                "title": "Human Resources",
+                "title": "Team",
                 "separator": True,
                 "items": [
                     {

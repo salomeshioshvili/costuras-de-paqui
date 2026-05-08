@@ -1,296 +1,429 @@
 {% extends 'portal/base.html' %}
 {% block title %}Welcome{% endblock %}
+{% block body_class %}cdp-page--home{% endblock %}
+{% block main_class %}cdp-main--bleed{% endblock %}
 
 {% block extra_css %}
 <style>
   main { max-width: 100%; padding: 0; }
 
+  /* Shared landing tones — section edges match for seamless color handoff */
+  .land-home {
+    --land-cream: #fdf7f0;
+    --land-blush: #ffd8e8;
+    --land-mist: #f9f4f0;
+    --land-lilac-edge: #f1eaf7;
+    --land-lilac: #e2daf6;
+    --land-lilac-deep: #cdc0ea;
+  }
+
+  /* --- Hero --- */
   .hero {
-    background: var(--dark);
+    background:
+      linear-gradient(180deg, transparent 0%, transparent 52%, rgba(255, 245, 248, 0.5) 78%, rgba(253, 247, 240, 0.88) 100%),
+      radial-gradient(ellipse 85% 70% at 50% 100%, rgba(132, 94, 194, 0.14) 0%, transparent 55%),
+      linear-gradient(165deg, #ffe0ec 0%, #ffd6e3 42%, #f5e6ff 100%);
     min-height: 88vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
     text-align: center;
     position: relative;
     overflow: hidden;
-    padding: 4rem 2rem;
+    padding: 3rem 1.5rem 0;
   }
   .hero::before {
     content: '';
-    position: absolute;
-    inset: 0;
+    position:absolute;
+    inset:0;
     background:
-      radial-gradient(ellipse 60% 60% at 20% 50%, rgba(201,168,76,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 80% 30%, rgba(201,168,76,0.08) 0%, transparent 50%);
+      radial-gradient(circle at 15% 25%, rgba(255,255,255,0.5) 0%, transparent 45%),
+      radial-gradient(circle at 88% 60%, rgba(132, 94, 194, 0.12) 0%, transparent 42%),
+      radial-gradient(circle at 50% 110%, rgba(74, 124, 90, 0.06) 0%, transparent 35%);
+    pointer-events: none;
   }
-  .hero-content { position: relative; max-width: 680px; }
-  .hero-eyebrow {
-    display: inline-block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.2em;
-    color: var(--gold);
-    border: 1px solid rgba(201,168,76,0.4);
-    padding: 0.35rem 1rem;
-    border-radius: 20px;
-    margin-bottom: 1.5rem;
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 12%;
+    left: -15%;
+    width: 130%;
+    height: 120px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 80' fill='none' stroke='%23483d5c' stroke-width='1.2' stroke-opacity='0.12'%3E%3Cpath d='M0 40c80-18 120 18 200 0s120-22 200 0 120 18 200 0'/%3E%3Cpath d='M0 52c90 14 110-14 200 0s110 14 200 0 110-14 200 0'/%3E%3C/svg%3E") repeat-x;
+    background-size: 600px 80px;
+    opacity: 0.85;
+    pointer-events: none;
   }
+  .hero-deco { position: absolute; pointer-events: none; }
+  .hero-deco--dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #1a1a1a; opacity: 0.1;
+  }
+  .hero-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 920px; }
   .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    color: #fff;
-    line-height: 1.1;
-    margin-bottom: 1.25rem;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(2rem, 6.5vw, 3.85rem);
+    line-height: 0.98;
+    text-transform: uppercase;
+    color: var(--p-ink);
+    letter-spacing: -0.03em;
+    margin: 0 0 0.25rem;
   }
-  .hero h1 em { color: var(--gold); font-style: italic; }
-  .hero p {
-    color: rgba(255,255,255,0.6);
+  .hero h1 .line-2 { display: block; margin-top: 0.08em; color: var(--p-accent); }
+  .hero-lead {
     font-size: 1.05rem;
-    line-height: 1.7;
-    margin-bottom: 2.5rem;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
+    line-height: 1.65;
+    color: var(--p-muted);
+    max-width: 34rem;
+    margin: 1.35rem auto 0;
+    font-weight: 500;
   }
-  .hero-cta { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-  .btn-hero-primary {
-    background: var(--gold);
-    color: var(--dark);
-    padding: 0.85rem 2rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border-radius: 2px;
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2.25rem;
+  }
+  .btn-land-pill {
+    background: #fff;
+    color: var(--p-ink);
+    border: 2px solid var(--p-ink);
+    border-radius: 999px;
+    padding: 0.95rem 2.1rem;
+    font-weight: 800;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     text-decoration: none;
-    transition: all 0.2s;
+    transition: transform 0.15s, box-shadow 0.15s;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
-  .btn-hero-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
-  .btn-hero-outline {
-    background: transparent;
-    color: rgba(255,255,255,0.7);
-    padding: 0.85rem 2rem;
-    font-size: 0.95rem;
-    border: 1.5px solid rgba(255,255,255,0.2);
-    border-radius: 2px;
-    text-decoration: none;
-    transition: all 0.2s;
+  .btn-land-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 var(--p-ink);
+    color: var(--p-ink);
   }
-  .btn-hero-outline:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
 
-  /* FEATURES */
+  .hero .tape {
+    margin: 2rem -5vw 1.35rem;
+    flex-shrink: 0;
+    align-self: center;
+    width: calc(100% + 10vw);
+    max-width: none;
+  }
+  .tape {
+    background: linear-gradient(90deg, #4f3d78 0%, #362b52 50%, #4a3a6e 100%);
+    transform: rotate(-1.8deg) scale(1.02);
+    padding: 11px 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 3;
+    box-shadow: 0 10px 32px rgba(54, 43, 82, 0.25);
+  }
+  .tape-track {
+    display: flex;
+    gap: 3.5rem;
+    width: max-content;
+    animation: land-tape 22s linear infinite;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  @keyframes land-tape {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .wave-to-cream {
+    line-height: 0;
+    margin-top: -6px;
+    margin-bottom: -1px;
+    position: relative;
+    z-index: 1;
+  }
+  .wave-to-cream svg {
+    width: 100%;
+    height: clamp(52px, 10vw, 72px);
+    display: block;
+  }
+
   .features {
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    margin: 0;
+    max-width: none;
+    padding: clamp(3.5rem, 10vw, 5.25rem) clamp(1.25rem, 4vw, 2rem) clamp(4rem, 12vw, 6rem);
+    background: linear-gradient(
+      180deg,
+      var(--land-mist) 0%,
+      var(--land-cream) 14%,
+      var(--land-cream) 76%,
+      var(--land-lilac-edge) 100%
+    );
+  }
+  .features-inner {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 5rem 2rem;
   }
-  .features-header { text-align: center; margin-bottom: 3rem; }
+  .features-header { text-align: center; margin-bottom: 2.75rem; }
   .features-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(1.5rem, 3.5vw, 2.15rem);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--p-ink);
+    margin-bottom: 0.65rem;
   }
-  .features-header p { color: var(--muted); max-width: 480px; margin: 0 auto; }
+  .features-header p { color: var(--p-muted); max-width: 460px; margin: 0 auto; }
   .features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.5rem;
+    gap: 1.35rem;
   }
   .feature-card {
     background: #fff;
-    border: 1px solid var(--border);
-    padding: 2rem;
-    border-radius: 2px;
+    border: 1px solid var(--p-border);
+    padding: 2rem 1.5rem;
+    border-radius: var(--p-radius);
+    box-shadow: var(--shadow);
     text-align: center;
-    transition: box-shadow 0.2s, transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
-  .feature-card:hover { box-shadow: 0 8px 32px rgba(26,18,8,0.1); transform: translateY(-2px); }
+  .feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(72, 52, 120, 0.1);
+  }
   .feature-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    display: block;
-  }
-  .feature-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
-  .feature-card p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
-
-  /* HOW IT WORKS */
-  .how { background: var(--dark); padding: 5rem 2rem; }
-  .how-inner { max-width: 1100px; margin: 0 auto; }
-  .how h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    color: #fff;
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; }
-  .step { text-align: center; }
-  .step-num {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(201,168,76,0.15);
-    border: 1.5px solid var(--gold);
-    color: var(--gold);
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: var(--p-accent-soft);
+    color: var(--p-accent);
+    font-size: 1.35rem;
+  }
+  .feature-card h3 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+    color: var(--p-ink);
+  }
+  .feature-card p { color: var(--p-muted); font-size: 0.88rem; line-height: 1.6; margin: 0; }
+
+  .how {
+    position: relative;
+    z-index: 0;
+    background: linear-gradient(
+      180deg,
+      var(--land-lilac-edge) 0%,
+      var(--land-lilac) 32%,
+      #d8ccec 78%,
+      var(--land-lilac-deep) 100%
+    );
+    padding: clamp(4.5rem, 11vw, 6.5rem) clamp(1.25rem, 4vw, 2rem) clamp(5rem, 12vw, 6.75rem);
+  }
+  .how-inner { max-width: 1100px; margin: 0 auto; }
+  .how h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    text-transform: uppercase;
+    color: var(--p-ink);
+    text-align: center;
+    margin-bottom: 2.75rem;
+  }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.75rem; }
+  .step { text-align: center; }
+  .step-num {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--p-ink);
+    color: var(--p-ink);
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
     margin: 0 auto 1rem;
   }
-  .step h4 { color: #fff; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; }
-  .step p { color: rgba(255,255,255,0.5); font-size: 0.85rem; }
+  .step h4 { color: var(--p-ink); font-size: 0.92rem; font-weight: 800; margin-bottom: 0.45rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .step p { color: var(--p-muted); font-size: 0.86rem; line-height: 1.5; margin: 0; }
 
-  /* CTA BANNER */
   .cta-banner {
-    max-width: 1100px;
-    margin: 5rem auto;
-    padding: 0 2rem;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: clamp(4rem, 10vw, 5.5rem) clamp(1.25rem, 4vw, 2rem) clamp(4.5rem, 11vw, 5.5rem);
+    background: linear-gradient(
+      180deg,
+      var(--land-lilac-deep) 0%,
+      #ddd0f0 18%,
+      #ebe4f0 38%,
+      var(--land-cream) 72%,
+      var(--land-cream) 100%
+    );
   }
   .cta-inner {
-    background: linear-gradient(135deg, var(--gold) 0%, #a07830 100%);
-    border-radius: 2px;
-    padding: 3rem;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+    background: linear-gradient(135deg, #3d2f5c 0%, #2a223c 100%);
+    border-radius: var(--p-radius);
+    padding: 3rem 2rem;
     text-align: center;
+    border: 1px solid rgba(248, 200, 220, 0.2);
   }
   .cta-inner h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    color: var(--dark);
-    margin-bottom: 0.75rem;
-  }
-  .cta-inner p { color: rgba(26,18,8,0.7); margin-bottom: 1.5rem; }
-  .btn-cta {
-    background: var(--dark);
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(1.4rem, 3vw, 1.9rem);
+    text-transform: uppercase;
     color: #fff;
-    padding: 0.85rem 2.5rem;
-    text-decoration: none;
-    font-weight: 600;
-    border-radius: 2px;
-    font-size: 0.95rem;
-    display: inline-block;
-    transition: background 0.2s;
+    margin-bottom: 0.65rem;
+    letter-spacing: -0.02em;
   }
-  .btn-cta:hover { background: var(--brown); }
+  .cta-inner p { color: rgba(255,255,255,0.7); margin-bottom: 1.5rem; font-size: 0.95rem; }
+  .btn-cta {
+    background: #fff;
+    color: var(--p-accent);
+    padding: 0.9rem 2.25rem;
+    text-decoration: none;
+    font-weight: 800;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: inline-block;
+    border: 2px solid #fff;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); color: var(--p-accent); filter: brightness(0.92); }
 
   footer { margin-top: 0; }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- HERO -->
+<div class="land-home">
 <section class="hero">
-  <div class="hero-content">
-    <span class="hero-eyebrow">✦ Bespoke Tailoring Since 2010</span>
-    <h1>Crafted for <em>You</em>,<br>Stitched with Care</h1>
-    <p>Order custom garments online, track your production in real time, and receive your perfectly tailored pieces at your door.</p>
-    <div class="hero-cta">
-      <a href="{% url 'portal_register' %}" class="btn-hero-primary">✦ Start Your Order</a>
-      <a href="{% url 'portal_login' %}" class="btn-hero-outline">Sign in</a>
+  <span class="hero-deco hero-deco--dot" style="top:20%;left:14%;" aria-hidden="true"></span>
+  <span class="hero-deco hero-deco--dot" style="top:32%;right:16%;" aria-hidden="true"></span>
+  <span class="hero-deco hero-deco--dot" style="bottom:18%;left:20%;" aria-hidden="true"></span>
+  <div class="hero-body">
+    <div class="hero-content">
+      <h1><span class="line-2">Alterations &amp; custom sewing</span></h1>
+      <p class="hero-lead">Book online, follow every production stage, and pick up or receive pieces finished to the workshop standard.</p>
+      <div class="hero-cta">
+        <a href="{% url 'portal_book' %}" class="btn-land-pill"><i class="bi bi-calendar-plus" aria-hidden="true"></i> Book a garment</a>
+      </div>
+    </div>
+  </div>
+  <div class="tape" aria-hidden="true">
+    <div class="tape-track">
+      <span>Alterations</span><span>+</span><span>Bridal</span><span>+</span><span>Suits</span><span>+</span><span>Fittings</span><span>+</span><span>Repairs</span><span>+</span><span>Custom</span><span>+</span>
+      <span>Alterations</span><span>+</span><span>Bridal</span><span>+</span><span>Suits</span><span>+</span><span>Fittings</span><span>+</span><span>Repairs</span><span>+</span><span>Custom</span><span>+</span>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
+<div class="wave-to-cream" aria-hidden="true">
+  <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="landWaveGrad" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+        <stop offset="0%" stop-color="#ffd8e8"/>
+        <stop offset="35%" stop-color="#f7ecee"/>
+        <stop offset="70%" stop-color="#f9f5f0"/>
+        <stop offset="100%" stop-color="#f9f4f0"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#landWaveGrad)" d="M0,56 C220,28 400,62 720,40 C980,22 1220,52 1440,34 L1440,72 L0,72 Z"/>
+  </svg>
+</div>
+
 <section class="features">
+  <div class="features-inner">
   <div class="features-header">
-    <h2>Everything you need, in one place</h2>
-    <p>From your first fitting to final delivery, we keep you informed every step of the way.</p>
+    <h2>Everything in one place</h2>
+    <p>Measurements, production updates, and delivery—without chasing calls or texts.</p>
   </div>
   <div class="features-grid">
     <div class="feature-card">
-      <span class="feature-icon">📐</span>
-      <h3>Custom Measurements</h3>
-      <p>We record your exact measurements so every piece fits perfectly, every time.</p>
+      <span class="feature-icon"><i class="bi bi-rulers" aria-hidden="true"></i></span>
+      <h3>Measurements</h3>
+      <p>Your numbers stay on file so repeat orders stay consistent.</p>
     </div>
     <div class="feature-card">
-      <span class="feature-icon">🧵</span>
-      <h3>Real-Time Tracking</h3>
-      <p>Follow your garment through every production stage from cutting to finishing.</p>
+      <span class="feature-icon"><i class="bi bi-activity" aria-hidden="true"></i></span>
+      <h3>Live stages</h3>
+      <p>See where each garment sits in the workshop pipeline.</p>
     </div>
     <div class="feature-card">
-      <span class="feature-icon"><i class="bi bi-box-seam"></i></span>
-      <h3>Flexible Delivery</h3>
-      <p>Choose pickup or delivery. We'll notify you the moment your order is ready.</p>
+      <span class="feature-icon"><i class="bi bi-truck" aria-hidden="true"></i></span>
+      <h3>Pickup or delivery</h3>
+      <p>Choose what suits you; we notify you when it is ready.</p>
     </div>
     <div class="feature-card">
-      <span class="feature-icon">💬</span>
-      <h3>Special Requests</h3>
-      <p>Add design notes, fabric preferences, and instructions directly in your order.</p>
+      <span class="feature-icon"><i class="bi bi-chat-text" aria-hidden="true"></i></span>
+      <h3>Your notes</h3>
+      <p>Fabric, fit, and design details stay on the order.</p>
     </div>
+  </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
 <section class="how">
   <div class="how-inner">
-    <h2>How It Works</h2>
+    <h2>How it works</h2>
     <div class="steps">
       <div class="step">
         <div class="step-num">1</div>
-        <h4>Create Account</h4>
-        <p>Register in seconds with your email and basic details.</p>
+        <h4>Book</h4>
+        <p>Request a date and describe the garment online; we confirm details with you before work starts.</p>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h4>Submit Booking</h4>
-        <p>Choose your garment type, fabric, color, and due date.</p>
+        <h4>Booking</h4>
+        <p>Garment type, fabric, color, and requested date.</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h4>Track Progress</h4>
-        <p>Watch your garment move through each production stage.</p>
+        <h4>Track</h4>
+        <p>Follow cutting, sewing, finishing, and QC.</p>
       </div>
       <div class="step">
         <div class="step-num">4</div>
-        <h4>Receive Order</h4>
-        <p>Pick up or have it delivered once it passes quality check.</p>
+        <h4>Hand-off</h4>
+        <p>Collect or receive once quality is signed off.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- THREE PORTALS -->
-<div style="max-width:1100px;margin:0 auto 5rem;padding:0 2rem;">
-  <div style="text-align:center;margin-bottom:2.5rem;">
-    <h2 style="font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:0.5rem;">Access Portals</h2>
-    <p style="color:var(--muted);">Different access levels for every role in the shop.</p>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;">
-    <div style="background:var(--dark);border-radius:2px;padding:2rem;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:1rem;">👑</div>
-      <h3 style="font-family:'Playfair Display',serif;color:#fff;margin-bottom:0.5rem;">Owner / Admin</h3>
-      <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:1.5rem;">Full system control. Manage orders, employees, payments, reports, and all operations.</p>
-      <a href="/admin/" style="display:inline-block;background:var(--gold);color:var(--dark);padding:0.65rem 1.5rem;border-radius:2px;text-decoration:none;font-weight:600;font-size:0.875rem;">Admin panel</a>
-    </div>
-    <div style="background:var(--dark);border-radius:2px;padding:2rem;text-align:center;border:1px solid rgba(201,168,76,0.3);">
-      <div style="font-size:2.5rem;margin-bottom:1rem;">🧵</div>
-      <h3 style="font-family:'Playfair Display',serif;color:#fff;margin-bottom:0.5rem;">Staff / Employee</h3>
-      <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:1.5rem;">View assigned tickets, update production stages, and track orders in progress.</p>
-      <a href="{% url 'emp_login' %}" style="display:inline-block;background:var(--gold);color:var(--dark);padding:0.65rem 1.5rem;border-radius:2px;text-decoration:none;font-weight:600;font-size:0.875rem;">Staff login</a>
-    </div>
-    <div style="background:var(--dark);border-radius:2px;padding:2rem;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:1rem;">👗</div>
-      <h3 style="font-family:'Playfair Display',serif;color:#fff;margin-bottom:0.5rem;">Customer</h3>
-      <p style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:1.5rem;">Book garments, track your order status in real time, and manage your profile.</p>
-      <a href="{% url 'portal_register' %}" style="display:inline-block;background:var(--gold);color:var(--dark);padding:0.65rem 1.5rem;border-radius:2px;text-decoration:none;font-weight:600;font-size:0.875rem;">Get started</a>
-    </div>
-  </div>
-</div>
-
-<!-- CTA -->
 <div class="cta-banner">
   <div class="cta-inner">
-    <h2>Ready for your perfect fit?</h2>
-    <p>Join hundreds of happy customers who trust StitchPro with their wardrobe.</p>
-    <a href="{% url 'portal_register' %}" class="btn-cta">Get Started, It's Free</a>
+    <h2>Ready when you are</h2>
+    <p>Alterations, one-off pieces, and full custom — documented from first cut to final press.</p>
+    <a href="{% url 'portal_book' %}" class="btn-cta">Book a garment</a>
   </div>
+</div>
 </div>
 {% endblock %}

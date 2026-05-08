@@ -4,26 +4,34 @@
 {% block extra_css %}
 <style>
   .page-header { margin-bottom: 2rem; }
-  .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.25rem; }
-  .page-header p { color: var(--muted); }
+  .page-header h1 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--p-ink);
+    margin-bottom: 0.35rem;
+  }
+  .page-header p { color: var(--p-muted); font-size: 0.95rem; }
   .section-label {
-    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 1rem;
-    padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--p-accent); margin-bottom: 1rem;
+    padding-bottom: 0.5rem; border-bottom: 1px solid var(--p-border);
   }
   .radio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem; }
   .radio-option input[type=radio] { display: none; }
   .radio-option label {
     display: block; padding: 0.65rem 1rem; border: 1.5px solid var(--border);
-    border-radius: 2px; cursor: pointer; font-size: 0.85rem; text-align: center;
+    border-radius: 16px; cursor: pointer; font-size: 0.85rem; text-align: center;
     transition: all 0.15s; background: var(--warm-white); color: var(--dark);
     text-transform: none; letter-spacing: 0; font-weight: 400;
   }
-  .radio-option input:checked + label { border-color: var(--gold); background: #fffbf0; font-weight: 600; color: var(--dark); }
-  .radio-option label:hover { border-color: var(--gold-light); }
-  .form-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+  .radio-option input:checked + label { border-color: var(--p-accent); background: var(--p-accent-soft); font-weight: 600; color: var(--p-ink); }
+  .radio-option label:hover { border-color: rgba(132, 94, 194, 0.45); }
+  .form-note { font-size: 0.78rem; color: var(--p-muted); margin-top: 0.3rem; }
   .btn-full { width: 100%; justify-content: center; padding: 0.9rem; font-size: 0.95rem; }
-  .error-box { background:#fdf2f2;border:1px solid #f5c6cb;border-left:4px solid var(--danger);color:var(--danger);padding:0.85rem 1.25rem;border-radius:0 2px 2px 0;margin-bottom:1.5rem;font-size:0.875rem; }
-  .info-box { background:#f0f6fa;border:1px solid #b8d0e0;border-left:4px solid var(--info);color:var(--info);padding:0.85rem 1.25rem;border-radius:0 2px 2px 0;margin-bottom:1.5rem;font-size:0.875rem; }
+  .error-box { background:#fdf2f2;border:1px solid #f5c6cb;border-left:4px solid var(--danger);color:var(--danger);padding:0.85rem 1.25rem;border-radius:0 16px 16px 0;margin-bottom:1.5rem;font-size:0.875rem; }
+  .info-box { background:#f0f6fa;border:1px solid #b8d0e0;border-left:4px solid var(--info);color:var(--info);padding:0.85rem 1.25rem;border-radius:0 16px 16px 0;margin-bottom:1.5rem;font-size:0.875rem; }
 </style>
 {% endblock %}
 
@@ -34,11 +42,11 @@
 </div>
 
 <div class="info-box">
-  ℹ Your booking will be reviewed by our team. We will contact you to confirm measurements, pricing, and scheduling before production begins.
+  <i class="bi bi-info-circle me-2" aria-hidden="true"></i>Your booking will be reviewed by our team. We will contact you to confirm measurements, pricing, and scheduling before production begins.
 </div>
 
 {% if error %}
-<div class="error-box"><i class="bi bi-exclamation-triangle"></i> {{ error }}</div>
+<div class="error-box"><i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i>{{ error }}</div>
 {% endif %}
 
 <div class="card">
@@ -105,7 +113,7 @@
     </div>
 
     <div style="margin-top:1.5rem;">
-      <button type="submit" class="btn btn-primary btn-full">✦ Submit Booking</button>
+      <button type="submit" class="btn btn-primary btn-full"><i class="bi bi-send me-1" aria-hidden="true"></i>Submit booking</button>
     </div>
   </form>
 </div>

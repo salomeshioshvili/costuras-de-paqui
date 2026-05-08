@@ -1,37 +1,42 @@
 {% extends 'employee/base.html' %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<div class="page-header">
-  <h1>Good to see you, {{ employee.first_name }} 👋</h1>
-  <p>{{ employee.get_role_display }} · Here's your work overview for today</p>
+<div class="cdp-dash-intro">
+  <h1 style="font-size:clamp(1.2rem,2.5vw,1.45rem);margin-bottom:0.35rem;">Good day, {{ employee.first_name }}</h1>
+  <p style="color:var(--e-muted);font-size:0.9rem;margin:0;">{{ employee.get_role_display }} · Your work at a glance</p>
 </div>
 
-<div class="stats-row">
-  <div class="stat stat-blue">
-    <div class="stat-num">{{ my_open }}</div>
-    <div class="stat-label">My Open Tickets</div>
+<div class="cdp-metric-grid">
+  <div class="cdp-metric-card cdp-metric-card--sky">
+    <i class="cdp-metric-card__icon bi bi-folder2-open" aria-hidden="true"></i>
+    <div class="cdp-metric-card__label">My open tickets</div>
+    <div class="cdp-metric-card__value">{{ my_open }}</div>
   </div>
-  <div class="stat stat-yellow">
-    <div class="stat-num">{{ my_urgent }}</div>
-    <div class="stat-label">Urgent</div>
+  <div class="cdp-metric-card cdp-metric-card--blush">
+    <i class="cdp-metric-card__icon bi bi-lightning-charge" aria-hidden="true"></i>
+    <div class="cdp-metric-card__label">Urgent</div>
+    <div class="cdp-metric-card__value">{{ my_urgent }}</div>
   </div>
-  <div class="stat stat-green">
-    <div class="stat-num">{{ my_done_today }}</div>
-    <div class="stat-label">Completed Today</div>
+  <div class="cdp-metric-card cdp-metric-card--mint">
+    <i class="cdp-metric-card__icon bi bi-check2-circle" aria-hidden="true"></i>
+    <div class="cdp-metric-card__label">Completed today</div>
+    <div class="cdp-metric-card__value">{{ my_done_today }}</div>
   </div>
-  <div class="stat stat-red">
-    <div class="stat-num">{{ shop_overdue }}</div>
-    <div class="stat-label">Shop Overdue</div>
+  <div class="cdp-metric-card cdp-metric-card--lemon">
+    <i class="cdp-metric-card__icon bi bi-clock-history" aria-hidden="true"></i>
+    <div class="cdp-metric-card__label">Shop overdue</div>
+    <div class="cdp-metric-card__value">{{ shop_overdue }}</div>
   </div>
 </div>
 
 <!-- MY ASSIGNED TICKETS -->
-<div class="card">
+<div class="card" style="overflow:hidden;border-radius:var(--radius);">
   <div class="card-header">
-    <span class="card-title"><i class="bi bi-ticket-detailed"></i> My assigned tickets</span>
-    <a href="{% url 'emp_my_tickets' %}" class="btn btn-outline btn-sm">View All</a>
+    <span class="card-title"><i class="bi bi-ticket-perforated me-1" aria-hidden="true"></i> My assigned tickets</span>
+    <a href="{% url 'emp_my_tickets' %}" class="btn btn-outline btn-sm">View all</a>
   </div>
   {% if my_tickets %}
+  <div style="overflow-x:auto;">
   <table>
     <thead>
       <tr>
@@ -50,23 +55,24 @@
         <td><code style="color:var(--accent);font-family:'DM Mono',monospace;font-size:0.8rem;">{{ ticket.ticket_code }}</code></td>
         <td>{{ ticket.order_item.garment_type }}</td>
         <td>{{ ticket.order_item.order.customer.full_name }}</td>
-        <td>{{ ticket.current_stage.stage_name|default:"not set" }}</td>
+        <td>{{ ticket.current_stage.stage_name|default:"—" }}</td>
         <td>
           <span class="priority-dot priority-{{ ticket.priority }}"></span>
           {{ ticket.get_priority_display }}
         </td>
         <td>
           {% if ticket.deadline %}
-            {% if ticket.is_overdue %}<span style="color:var(--red);">overdue {% endif %}
+            {% if ticket.is_overdue %}<span class="text-danger small fw-semibold">Overdue · {% endif %}
             {{ ticket.deadline|date:"M d" }}
             {% if ticket.is_overdue %}</span>{% endif %}
-          {% else %}not set{% endif %}
+          {% else %}—{% endif %}
         </td>
-        <td><a href="{% url 'emp_ticket_detail' ticket.pk %}" class="btn btn-outline btn-sm">Update</a></td>
+        <td><a href="{% url 'emp_ticket_detail' ticket.pk %}" class="btn btn-outline btn-sm">Update <i class="bi bi-arrow-right-short" aria-hidden="true"></i></a></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}
   <p style="color:var(--muted);padding:1rem 0;text-align:center;">No tickets assigned to you right now.</p>
   {% endif %}
@@ -75,7 +81,7 @@
 <!-- SHOP PIPELINE -->
 <div class="card">
   <div class="card-header">
-    <span class="card-title">🏭 Shop Production Pipeline</span>
+    <span class="card-title"><i class="bi bi-diagram-3 me-1" aria-hidden="true"></i> Shop production pipeline</span>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;">
     {% for stage in pipeline %}

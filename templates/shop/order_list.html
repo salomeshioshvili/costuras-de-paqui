@@ -3,25 +3,25 @@
 {% block page_title %}Orders{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+{% include "includes/workshop_page_intro.html" with title="Orders" subtitle="Filter by status and priority, or jump into a job." eyebrow="Workshop" %}
+<div class="shop-toolbar">
   <form class="d-flex gap-2 flex-wrap" method="get">
-    <input type="text" name="q" value="{{ q }}" class="form-control" style="width:200px" placeholder="Customer name…">
-    <select name="status" class="form-select" style="width:160px">
-      <option value="">All Statuses</option>
-      {% for val, label in status_choices %}<option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    <input type="text" name="q" value="{{ q }}" class="form-control" style="width:200px;max-width:100%" placeholder="Customer name…">
+    <select name="status" class="form-select" style="width:160px;max-width:100%">
+    <option value="">All statuses</option>
+    {% for val, label in status_choices %}<option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
-    <select name="priority" class="form-select" style="width:140px">
-      <option value="">All Priorities</option>
-      {% for val, label in priority_choices %}<option value="{{ val }}" {% if priority_filter == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    <select name="priority" class="form-select" style="width:140px;max-width:100%">
+    <option value="">All priorities</option>
+    {% for val, label in priority_choices %}<option value="{{ val }}" {% if priority_filter == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
     </select>
     <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
     <a href="{% url 'order_list' %}" class="btn btn-outline-secondary">Clear</a>
   </form>
-  <a href="{% url 'order_create' %}" class="btn btn-primary"><i class="bi bi-bag-plus"></i> New Order</a>
+  <a href="{% url 'order_create' %}" class="btn btn-primary"><i class="bi bi-bag-plus"></i> New order</a>
 </div>
 
-<div class="card">
-  <div class="card-body p-0">
+<div class="shop-table-card">
     <table class="table table-hover mb-0">
       <thead><tr>
         <th style="padding-left:16px">#</th>
@@ -39,16 +39,16 @@
       {% for order in orders %}
         <tr {% if order.pk in overdue_ids %}class="overdue-row"{% endif %}>
           <td style="padding-left:16px">
-            <a href="{% url 'order_detail' order.pk %}" style="font-weight:600;color:#7c3aed">#{{ order.pk }}</a>
+            <a href="{% url 'order_detail' order.pk %}" style="font-weight:600;color:#845ec2">#{{ order.pk }}</a>
           </td>
           <td>{{ order.customer.full_name }}</td>
           <td style="font-size:12px">{{ order.order_date|date:"M j, Y" }}</td>
           <td style="font-size:12px">
             {% if order.due_date %}
               <span {% if order.pk in overdue_ids %}style="color:#dc2626;font-weight:600"{% endif %}>
-                {{ order.due_date|date:"M j, Y" }}{% if order.pk in overdue_ids %} <i class="bi bi-exclamation-triangle"></i>{% endif %}
+                {{ order.due_date|date:"M j, Y" }}{% if order.pk in overdue_ids %} <span class="text-danger small">(overdue)</span>{% endif %}
               </span>
-            {% else %}not set{% endif %}
+            {% else %}—{% endif %}
           </td>
           <td>{{ order.items.count }}</td>
           <td>${{ order.final_amount }}</td>
@@ -64,6 +64,5 @@
       {% endfor %}
       </tbody>
     </table>
-  </div>
 </div>
 {% endblock %}

@@ -12,11 +12,11 @@
         <div class="mb-2">
           <span class="badge-status badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
           <span class="badge-status badge-{{ ticket.priority }} ms-1">{{ ticket.get_priority_display }}</span>
-          {% if ticket.is_overdue %}<span class="badge ms-1" style="background:#fee2e2;color:#dc2626"><i class="bi bi-exclamation-triangle"></i> Overdue</span>{% endif %}
+          {% if ticket.is_overdue %}<span class="badge ms-1" style="background:#fee2e2;color:#dc2626">Overdue</span>{% endif %}
         </div>
         <div class="mb-2"><strong>Garment:</strong> {{ ticket.order_item.garment_type }}</div>
         <div class="mb-2"><strong>Order:</strong>
-          <a href="{% url 'order_detail' ticket.order_item.order.pk %}" style="color:#7c3aed">
+          <a href="{% url 'order_detail' ticket.order_item.order.pk %}" style="color:#845ec2">
             #{{ ticket.order_item.order.pk }}
           </a>
         </div>
@@ -82,7 +82,7 @@
 
     <!-- Report Damage -->
     <div class="card">
-      <div class="card-header" style="color:#dc2626"><span style="font-weight:600"><i class="bi bi-exclamation-triangle"></i> Report damage</span></div>
+      <div class="card-header" style="color:#dc2626"><span style="font-weight:600">Report damage</span></div>
       <div class="card-body">
         <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#damageModal">
           Report Incident
@@ -239,12 +239,8 @@
             <div class="col-6">
               <label class="form-label">Reported By</label>
               <select name="reported_by" class="form-select">
-                <option value="">,</option>
-                {% for assignment in ticket.assignments.all %}
-                  <option value="{{ assignment.employee.pk }}" {% if assignment.assignment_status == 'current' %}selected{% endif %}>
-                    {{ assignment.employee.full_name }}
-                  </option>
-                {% endfor %}
+                <option value="">—</option>
+                {% for e in ticket.order_item.order.customer.orders.all %}{% endfor %}
               </select>
             </div>
             <div class="col-6">

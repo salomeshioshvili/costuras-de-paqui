@@ -30,7 +30,7 @@
         <td><span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
         <td><span class="priority-dot priority-{{ order.priority }}"></span>{{ order.get_priority_display }}</td>
         <td style="{% if order.is_overdue %}color:var(--red);{% endif %}">
-          {% if order.due_date %}{{ order.due_date|date:"M d, Y" }}{% else %}not set{% endif %}
+          {% if order.due_date %}{{ order.due_date|date:"M d, Y" }}{% else %}—{% endif %}
         </td>
         <td><span class="badge badge-{{ order.payment_status }}">{{ order.get_payment_status_display }}</span></td>
       </tr>

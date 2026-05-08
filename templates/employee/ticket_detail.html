@@ -3,14 +3,14 @@
 {% block content %}
 
 <div style="margin-bottom:1.25rem;">
-  <a href="{% url 'emp_my_tickets' %}" style="color:var(--muted);text-decoration:none;font-size:0.85rem;"><i class="bi bi-arrow-left"></i> Back to my tickets</a>
+  <a href="{% url 'emp_my_tickets' %}" style="color:var(--muted);text-decoration:none;font-size:0.85rem;">← Back to My Tickets</a>
 </div>
 
 <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
   <div>
     <h1 style="font-size:1.4rem;font-weight:700;margin-bottom:0.25rem;">
       <code style="color:var(--accent);">{{ ticket.ticket_code }}</code>
-      for {{ ticket.order_item.garment_type }}
+      — {{ ticket.order_item.garment_type }}
     </h1>
     <p style="color:var(--muted);font-size:0.875rem;">
       Order #{{ ticket.order_item.order.pk }} · {{ ticket.order_item.order.customer.full_name }}
@@ -28,22 +28,22 @@
   <div>
     <!-- GARMENT INFO -->
     <div class="card">
-      <div class="card-header"><span class="card-title">🧵 Garment Details</span></div>
+      <div class="card-header"><span class="card-title"><i class="bi bi-scissors me-1" aria-hidden="true"></i>Garment details</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
-        <div><div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:0.2rem;">Type</div><div>{{ ticket.order_item.garment_type }}</div></div>
-        {% if ticket.order_item.fabric %}<div><div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:0.2rem;">Fabric</div><div>{{ ticket.order_item.fabric }}</div></div>{% endif %}
-        {% if ticket.order_item.color %}<div><div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:0.2rem;">Color</div><div>{{ ticket.order_item.color }}</div></div>{% endif %}
-        <div><div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:0.2rem;">Qty</div><div>{{ ticket.order_item.quantity }}</div></div>
-        {% if ticket.deadline %}<div><div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:0.2rem;">Deadline</div><div style="{% if ticket.is_overdue %}color:var(--red);{% endif %}">{{ ticket.deadline|date:"M d, Y" }}</div></div>{% endif %}
+        <div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Type</div><div>{{ ticket.order_item.garment_type }}</div></div>
+        {% if ticket.order_item.fabric %}<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Fabric</div><div>{{ ticket.order_item.fabric }}</div></div>{% endif %}
+        {% if ticket.order_item.color %}<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Color</div><div>{{ ticket.order_item.color }}</div></div>{% endif %}
+        <div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Qty</div><div>{{ ticket.order_item.quantity }}</div></div>
+        {% if ticket.deadline %}<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Deadline</div><div style="{% if ticket.is_overdue %}color:var(--red);{% endif %}">{{ ticket.deadline|date:"M d, Y" }}</div></div>{% endif %}
       </div>
       {% if ticket.order_item.special_instructions %}
       <div style="margin-top:1rem;padding:0.75rem;background:var(--surface2);border-radius:6px;font-size:0.85rem;color:var(--muted);">
-        📝 {{ ticket.order_item.special_instructions }}
+        <i class="bi bi-chat-left-text me-1" aria-hidden="true"></i>{{ ticket.order_item.special_instructions }}
       </div>
       {% endif %}
       {% if ticket.order_item.measurements.all %}
       <div style="margin-top:1rem;">
-        <div style="font-size:0.72rem;color:var(--muted);letter-spacing:0.06em;margin-bottom:0.5rem;">Measurements</div>
+        <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">Measurements</div>
         {% for m in ticket.order_item.measurements.all %}
         <div style="display:flex;justify-content:space-between;font-size:0.85rem;padding:0.3rem 0;border-bottom:1px solid var(--border);">
           <span>{{ m.measurement_type }}</span>
@@ -57,7 +57,7 @@
     <!-- UPDATE STAGE -->
     {% if ticket.status != 'completed' and ticket.status != 'blocked' %}
     <div class="card">
-      <div class="card-header"><span class="card-title">⚡ Update Production Stage</span></div>
+      <div class="card-header"><span class="card-title"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Update production stage</span></div>
       <form method="post" action="{% url 'emp_update_stage' ticket.pk %}">
         {% csrf_token %}
         <div class="form-group">
@@ -81,7 +81,7 @@
     <!-- MARK COMPLETE -->
     {% if ticket.status == 'in_progress' or ticket.status == 'assigned' %}
     <div class="card" style="border-color:rgba(34,197,94,0.3);">
-      <div class="card-header"><span class="card-title"><i class="bi bi-check-circle"></i> Mark as completed</span></div>
+      <div class="card-header"><span class="card-title"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Mark as completed</span></div>
       <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Mark this ticket as fully completed when the garment is finished.</p>
       <form method="post" action="{% url 'emp_complete_ticket' ticket.pk %}">
         {% csrf_token %}
@@ -89,7 +89,7 @@
           <label>Completion Notes</label>
           <textarea name="comment" placeholder="Any final notes..."></textarea>
         </div>
-        <button type="submit" class="btn btn-success"><i class="bi bi-check2"></i> Mark complete</button>
+        <button type="submit" class="btn btn-success"><i class="bi bi-check2 me-1" aria-hidden="true"></i>Mark complete</button>
       </form>
     </div>
     {% endif %}
@@ -97,7 +97,7 @@
 
     {% if ticket.status == 'blocked' %}
     <div class="card" style="border-color:rgba(239,68,68,0.4);">
-      <div style="color:var(--red);font-weight:600;margin-bottom:0.5rem;">🚫 Ticket Blocked</div>
+      <div style="color:var(--red);font-weight:600;margin-bottom:0.5rem;"><i class="bi bi-slash-circle me-1" aria-hidden="true"></i>Ticket blocked</div>
       <p style="color:var(--muted);font-size:0.85rem;">This ticket has an unresolved damage incident. Contact your manager to resolve it.</p>
     </div>
     {% endif %}
@@ -107,21 +107,21 @@
   <div>
     <!-- PRODUCTION HISTORY -->
     <div class="card">
-      <div class="card-header"><span class="card-title">📍 Production History</span></div>
+      <div class="card-header"><span class="card-title"><i class="bi bi-clock-history me-1" aria-hidden="true"></i>Production history</span></div>
       {% if history %}
       <div class="timeline">
         {% for h in history %}
         <div class="tl-item">
           <div class="tl-dot done"></div>
           <div class="tl-stage">{{ h.stage.stage_name }}</div>
-          <div class="tl-time">{{ h.changed_at|date:"M d, Y, g:i A" }}{% if h.changed_by %} · {{ h.changed_by.full_name }}{% endif %}</div>
+          <div class="tl-time">{{ h.changed_at|date:"M d, Y — g:i A" }}{% if h.changed_by %} · {{ h.changed_by.get_full_name|default:h.changed_by.username }}{% endif %}</div>
           {% if h.comment %}<div style="font-size:0.8rem;color:var(--muted);margin-top:0.2rem;">{{ h.comment }}</div>{% endif %}
         </div>
         {% endfor %}
         {% if ticket.current_stage %}
         <div class="tl-item">
           <div class="tl-dot current"></div>
-          <div class="tl-stage">{{ ticket.current_stage.stage_name }} <span style="color:var(--green);font-size:0.75rem;">(current stage)</span></div>
+          <div class="tl-stage">{{ ticket.current_stage.stage_name }} <span style="color:var(--green);font-size:0.75rem;">← Now</span></div>
         </div>
         {% endif %}
       </div>
@@ -133,7 +133,7 @@
     <!-- DAMAGE INCIDENTS -->
     {% if incidents %}
     <div class="card" style="border-color:rgba(239,68,68,0.3);">
-      <div class="card-header"><span class="card-title"><i class="bi bi-exclamation-triangle"></i> Damage incidents</span></div>
+      <div class="card-header"><span class="card-title"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Damage incidents</span></div>
       {% for inc in incidents %}
       <div style="padding:0.75rem;background:var(--surface2);border-radius:6px;margin-bottom:0.75rem;">
         <div style="display:flex;justify-content:space-between;margin-bottom:0.35rem;">

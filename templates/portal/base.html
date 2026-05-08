@@ -1,152 +1,277 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}StitchPro{% endblock %}, bespoke tailoring</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <title>{% block title %}Home{% endblock %} · Costuras de Paqui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{% static 'css/costuras.css' %}" rel="stylesheet">
   <style>
+    :root {
+      --p-bg: #fdf7f0;
+      --p-ink: #1a1a1a;
+      --p-muted: #6b6560;
+      --p-accent: #845ec2;
+      --p-accent-soft: #efe6ff;
+      --p-border: rgba(26, 26, 26, 0.08);
+      --p-radius: 22px;
+      --shadow: 0 12px 40px rgba(44, 40, 57, 0.07);
+      --muted: var(--p-muted);
+      --dark: var(--p-ink);
+      --gold-light: #c4b5fd;
+      --border: var(--p-border);
+      --cream: var(--p-bg);
+      --warm-white: #fffcf8;
+      --danger: #b91c1c;
+      --info: #3730a3;
+      --success: #166534;
+      --gold: #f5e6a8;
+      --gold-light: #fce9b5;
+      --brown: #3d3658;
+      /* Align nav strip with hero top (homepage handoff) */
+      --p-surface-pink: #ffe2ec;
+      --p-surface-pink-soft: #ffe8f0;
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --cream: #faf7f2;
-      --warm-white: #fff8f0;
-      --gold: #c9a84c;
-      --gold-light: #e8c97a;
-      --dark: #1a1208;
-      --brown: #5c3d1e;
-      --muted: #8a7560;
-      --border: #e8ddd0;
-      --success: #3d7a5c;
-      --danger: #8b3a3a;
-      --info: #2c5f7a;
-      --radius: 2px;
-      --shadow: 0 2px 24px rgba(26,18,8,0.08);
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
     }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      color: var(--dark);
+    body.cdp-body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--p-bg);
+      color: var(--p-ink);
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       font-size: 15px;
-      line-height: 1.6;
+      line-height: 1.55;
     }
 
-    /* NAV */
-    nav {
-      background: var(--dark);
-      padding: 0 2rem;
+    /* Nav strip: pink behind bar; bottom always fades into page so main doesn’t “cut” */
+    .cdp-shell {
+      width: 100%;
+      padding: 1rem clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 1.75rem);
+      background:
+        linear-gradient(
+          180deg,
+          transparent 0%,
+          transparent 42%,
+          rgba(253, 247, 240, 0.22) 72%,
+          rgba(253, 247, 240, 0.82) 90%,
+          var(--p-bg) 100%
+        ),
+        linear-gradient(165deg, var(--p-surface-pink-soft) 0%, #ffd8e8 42%, rgba(245, 232, 255, 0.55) 100%);
+    }
+
+    /* Homepage: pink stays in the nav band only; hand off to warm cream before main */
+    .cdp-page--home .cdp-shell {
+      background:
+        linear-gradient(
+          180deg,
+          transparent 0%,
+          transparent 32%,
+          rgba(253, 247, 240, 0.4) 70%,
+          var(--p-bg) 100%
+        ),
+        linear-gradient(
+          165deg,
+          var(--p-surface-pink-soft) 0%,
+          #ffd8e8 38%,
+          rgba(245, 232, 255, 0.48) 100%
+        );
+      padding-bottom: clamp(1rem, 3vw, 1.5rem);
+    }
+
+    .cdp-topnav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 64px;
+      gap: 1rem;
+      flex-wrap: wrap;
+      max-width: 1180px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: 999px;
+      padding: 0.65rem 0.75rem 0.65rem 0.95rem;
+      box-shadow: 0 10px 36px rgba(132, 94, 194, 0.12);
       position: sticky;
-      top: 0;
+      top: 0.75rem;
       z-index: 100;
     }
-    .nav-brand {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      color: var(--gold);
+
+    .cdp-topnav__brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
       text-decoration: none;
-      letter-spacing: 0.02em;
+      color: var(--p-ink);
+      font-weight: 800;
+      font-size: 1.08rem;
+      letter-spacing: -0.03em;
     }
-    .nav-brand span { color: #fff; font-style: italic; }
-    .nav-links { display: flex; align-items: center; gap: 0.25rem; }
-    .nav-links a {
-      color: rgba(255,255,255,0.7);
+
+    .cdp-topnav__brand img {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      object-fit: contain;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      padding: 4px;
+      box-shadow: 0 4px 14px rgba(132, 94, 194, 0.12);
+    }
+
+    .cdp-topnav__brand em {
+      font-style: normal;
+      color: var(--p-accent);
+    }
+
+    .cdp-topnav__links {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.2rem;
+    }
+
+    .cdp-topnav__links a {
+      color: var(--p-muted);
       text-decoration: none;
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      border-radius: var(--radius);
-      transition: color 0.2s, background 0.2s;
-    }
-    .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.08); }
-    .nav-links .btn-nav {
-      background: var(--gold);
-      color: var(--dark);
+      font-size: 0.88rem;
       font-weight: 600;
-      margin-left: 0.5rem;
+      padding: 0.5rem 0.95rem;
+      border-radius: 999px;
+      transition: background 0.22s ease, color 0.22s ease;
     }
-    .nav-links .btn-nav:hover { background: var(--gold-light); }
 
-    /* MAIN */
-    main { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+    .cdp-topnav__links a:hover {
+      background: var(--p-accent-soft);
+      color: var(--p-accent);
+    }
 
-    /* MESSAGES */
-    .messages { margin-bottom: 1.5rem; }
+    .cdp-topnav__links a.is-cta {
+      background: var(--p-accent);
+      color: #fff !important;
+      font-weight: 700;
+    }
+
+    .cdp-topnav__links a.is-cta:hover {
+      filter: brightness(1.05);
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 1.75rem 1.25rem 2.5rem;
+      position: relative;
+    }
+
+    /* Soft overlap so nav strip and main never show a 1px seam */
+    main.cdp-main--bleed {
+      max-width: none;
+      padding-left: 0;
+      padding-right: 0;
+      margin-top: -1px;
+    }
+
+    .messages { margin-bottom: 1.25rem; }
     .msg {
-      padding: 0.85rem 1.25rem;
-      border-left: 4px solid;
+      padding: 0.9rem 1.15rem;
+      border-radius: 16px;
       margin-bottom: 0.5rem;
       font-size: 0.9rem;
-      border-radius: 0 var(--radius) var(--radius) 0;
+      font-weight: 600;
+      border: 1px solid transparent;
     }
-    .msg-success { background: #f0faf5; border-color: var(--success); color: var(--success); }
-    .msg-error { background: #fdf2f2; border-color: var(--danger); color: var(--danger); }
-    .msg-info { background: #f0f6fa; border-color: var(--info); color: var(--info); }
+    .msg-success { background: #e8faf3; border-color: #a7e9ce; color: #17624a; }
+    .msg-error { background: #fdf2f4; border-color: #f5c2cb; color: #9b2943; }
+    .msg-warning { background: #fff8e6; border-color: #fde68a; color: #92400e; }
+    .msg-info, .msg-debug { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
 
-    /* CARDS */
     .card {
       background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border: 1px solid var(--p-border);
+      border-radius: var(--p-radius);
       box-shadow: var(--shadow);
-      padding: 2rem;
+      padding: 1.75rem;
       margin-bottom: 1.5rem;
     }
+
     .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.35rem;
       padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.25rem;
-      color: var(--dark);
+      border-bottom: 1px solid var(--p-border);
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
-    /* BUTTONS */
+    .card-title {
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--p-ink);
+      letter-spacing: -0.02em;
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.4rem;
-      padding: 0.6rem 1.25rem;
-      border-radius: var(--radius);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 500;
+      padding: 0.65rem 1.35rem;
+      border-radius: 16px;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
       cursor: pointer;
       border: none;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: transform 0.15s, filter 0.15s;
     }
-    .btn-primary { background: var(--gold); color: var(--dark); }
-    .btn-primary:hover { background: var(--gold-light); }
-    .btn-dark { background: var(--dark); color: #fff; }
-    .btn-dark:hover { background: var(--brown); }
-    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--muted); }
-    .btn-outline:hover { border-color: var(--gold); color: var(--dark); }
-    .btn-sm { padding: 0.35rem 0.85rem; font-size: 0.8rem; }
 
-    /* BADGES */
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary { background: var(--p-accent); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.06); color: #fff; }
+
+    .btn-dark { background: var(--p-ink); color: #fff; }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--p-border);
+      color: var(--p-muted);
+    }
+
+    .btn-outline:hover { border-color: var(--p-accent); color: var(--p-accent); }
+    .btn-sm { padding: 0.4rem 0.95rem; font-size: 0.8rem; }
+
     .badge {
       display: inline-block;
-      padding: 0.25rem 0.65rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      }
+      padding: 0.28rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
     .badge-pending { background: #fef3cd; color: #856404; }
     .badge-confirmed { background: #d1e8ff; color: #0d47a1; }
     .badge-in_production { background: #e8d5f5; color: #6a1b9a; }
+    .badge-ready_for_delivery { background: #d4edda; color: #155724; }
     .badge-ready { background: #d4edda; color: #155724; }
     .badge-delivered { background: #d1ecf1; color: #0c5460; }
     .badge-cancelled { background: #f8d7da; color: #721c24; }
@@ -154,71 +279,86 @@
     .badge-completed { background: #d4edda; color: #155724; }
     .badge-blocked { background: #f8d7da; color: #721c24; }
 
-    /* FORMS */
-    .form-group { margin-bottom: 1.25rem; }
-    label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+    .form-group { margin-bottom: 1.15rem; }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--p-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.4rem;
+    }
     input, select, textarea {
       width: 100%;
-      padding: 0.7rem 1rem;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      color: var(--dark);
-      background: var(--warm-white);
-      transition: border-color 0.2s;
+      padding: 0.72rem 1rem;
+      border: 1.5px solid var(--p-border);
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      color: var(--p-ink);
+      background: #fffcf8;
       outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus, select:focus, textarea:focus { border-color: var(--gold); background: #fff; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--p-accent);
+      box-shadow: 0 0 0 3px rgba(132, 94, 194, 0.18);
+      background: #fff;
+    }
     textarea { resize: vertical; min-height: 100px; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
 
-    /* TABLE */
     table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; color: var(--muted); padding: 0.6rem 1rem; border-bottom: 2px solid var(--border); }
-    td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--cream); }
-
-    /* DIVIDER */
-    .divider { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
-
-    /* FOOTER */
-    footer {
-      text-align: center;
-      padding: 2rem;
-      color: var(--muted);
-      font-size: 0.8rem;
-      border-top: 1px solid var(--border);
-      margin-top: 4rem;
+    th {
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--p-muted);
+      padding: 0.65rem 0.85rem;
+      border-bottom: 2px solid var(--p-border);
     }
-    footer a { color: var(--gold); text-decoration: none; }
+    td { padding: 0.85rem 0.85rem; border-bottom: 1px solid var(--p-border); font-size: 0.9rem; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(132, 94, 194, 0.04); }
+
+    .divider { border: none; border-top: 1px solid var(--p-border); margin: 2rem 0; }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="cdp-body {% block body_class %}{% endblock %}">
 
-<nav>
-  <a href="{% url 'portal_home' %}" class="nav-brand">Stitch<span>Pro</span></a>
-  <div class="nav-links">
-    {% if user.is_authenticated and not user.is_staff %}
-      <a href="{% url 'portal_dashboard' %}">My Orders</a>
-      <a href="{% url 'portal_book' %}">Book Now</a>
-      <a href="{% url 'portal_profile' %}">Profile</a>
-      <a href="{% url 'portal_logout' %}">Sign Out</a>
-    {% elif user.is_staff %}
-      <a href="{% url 'dashboard' %}">Staff Dashboard</a>
-      <a href="{% url 'portal_logout' %}">Sign Out</a>
-    {% else %}
-      <a href="{% url 'portal_home' %}">Home</a>
-      <a href="{% url 'portal_login' %}">Sign In</a>
-      <a href="{% url 'portal_register' %}" class="btn-nav">Book Now</a>
-    {% endif %}
-  </div>
-</nav>
+{% block portal_nav %}
+<div class="cdp-shell">
+  <header class="cdp-topnav">
+    <a href="{% url 'portal_home' %}" class="cdp-topnav__brand">
+      <img src="{% static 'branding/logo.png' %}" alt="Costuras de Paqui">
+      Costuras <em>de Paqui</em>
+    </a>
+    <nav class="cdp-topnav__links" aria-label="Customer">
+      {% if user.is_authenticated and not user.is_staff %}
+        <a href="{% url 'portal_dashboard' %}">My orders</a>
+        <a href="{% url 'portal_book' %}">Book</a>
+        <a href="{% url 'portal_profile' %}">Profile</a>
+        <a href="{% url 'portal_logout' %}">Sign out</a>
+        <a href="{% url 'portal_book' %}" class="is-cta">New booking</a>
+      {% elif user.is_staff %}
+        <a href="{% url 'dashboard' %}">Staff dashboard</a>
+        <a href="{% url 'portal_logout' %}">Sign out</a>
+      {% else %}
+        <a href="{% url 'portal_home' %}">Home</a>
+        <a href="{% url 'portal_login' %}">Sign in</a>
+        <a href="{% url 'portal_register' %}" class="is-cta">Create account</a>
+      {% endif %}
+    </nav>
+  </header>
+</div>
+{% endblock %}
 
-<main>
+<main class="{% block main_class %}{% endblock %}">
   {% if messages %}
   <div class="messages">
     {% for message in messages %}
@@ -230,11 +370,7 @@
   {% block content %}{% endblock %}
 </main>
 
-<footer>
-  &copy; 2026 StitchPro Tailoring. All rights reserved. &nbsp;|&nbsp;
-  <a href="{% url 'portal_home' %}">Home</a> &nbsp;|&nbsp;
-  <a href="{% url 'portal_login' %}">Staff Login</a>
-</footer>
+{% include "includes/cdp_footer.html" %}
 
 </body>
 </html>

@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
-from django.db.models import Sum, Count, Q
+from decimal import Decimal
+from django.db.models import Sum, Count, Q, Value, DecimalField
+from django.db.models.functions import Coalesce
 from unfold.admin import ModelAdmin, TabularInline, StackedInline
 from unfold.decorators import display, action
 
@@ -9,8 +11,7 @@ from .models import (
     Customer, Employee, EmployeeAvailability,
     ProductionStage, CustomerOrder, OrderItem,
     Measurement, WorkTicket, TaskAssignment,
-    TicketStatusHistory, DamageIncident, Payment, Delivery,
-    Material, OrderItemMaterial
+    TicketStatusHistory, DamageIncident, Payment, Delivery
 )
 
 
@@ -35,13 +36,6 @@ class WorkTicketInline(TabularInline):
     fields = ('ticket_code', 'priority', 'status', 'current_stage', 'deadline')
     readonly_fields = ('ticket_code',)
     show_change_link = True
-
-
-class OrderItemMaterialInline(TabularInline):
-    model = OrderItemMaterial
-    extra = 1
-    fields = ('material', 'quantity', 'unit', 'color_override', 'notes')
-    autocomplete_fields = ['material']
 
 
 class TaskAssignmentInline(TabularInline):
@@ -93,13 +87,22 @@ class CustomerAdmin(ModelAdmin):
         }),
     )
 
-    @display(description='Total Orders')
-    def display_total_orders(self, obj):
-        return obj.total_orders
+    def get_queryset(self, request):
+        return super().get_queryset(request).annotate(
+            _orders_count=Count('orders'),
+            _active_orders_count=Count(
+                'orders',
+                filter=~Q(orders__status__in=['delivered', 'cancelled']),
+            ),
+        )
 
-    @display(description='Active Orders')
+    @display(description='Total Orders', ordering='_orders_count')
+    def display_total_orders(self, obj):
+        return obj._orders_count
+
+    @display(description='Active Orders', ordering='_active_orders_count')
     def display_active_orders(self, obj):
-        count = obj.active_orders
+        count = obj._active_orders_count
         if count > 0:
             return format_html('<span style="color: #7c3aed; font-weight: bold;">{}</span>', count)
         return count
@@ -170,13 +173,33 @@ class ProductionStageAdmin(ModelAdmin):
 @admin.register(CustomerOrder)
 class CustomerOrderAdmin(ModelAdmin):
     list_display = ('id', 'customer', 'order_date', 'due_date', 'status_badge',
-                    'priority_badge', 'final_amount', 'payment_status_badge', 'overdue_flag')
+                    'priority_badge', 'display_items_count', 'subtotal_amount', 'final_amount',
+                    'display_total_paid', 'payment_status_badge', 'overdue_flag')
     list_filter = ('status', 'priority', 'payment_status', 'order_date')
     search_fields = ('customer__first_name', 'customer__last_name', 'notes')
     date_hierarchy = 'order_date'
     inlines = [OrderItemInline, PaymentInline]
     autocomplete_fields = ['customer']
     readonly_fields = ('subtotal_amount', 'final_amount', 'created_at', 'updated_at')
+
+    def get_queryset(self, request):
+        paid_field = DecimalField(max_digits=10, decimal_places=2)
+        return super().get_queryset(request).select_related('customer').annotate(
+            _items_count=Count('items'),
+            _total_paid=Coalesce(
+                Sum('payments__amount'),
+                Value(Decimal('0.00')),
+                output_field=paid_field,
+            ),
+        )
+
+    @display(description='Items', ordering='_items_count')
+    def display_items_count(self, obj):
+        return obj._items_count
+
+    @display(description='Paid Σ', ordering='_total_paid')
+    def display_total_paid(self, obj):
+        return obj._total_paid
     fieldsets = (
         ('Order Details', {
             'fields': ('customer', ('order_date', 'due_date'), ('status', 'priority'), 'notes')
@@ -236,10 +259,8 @@ class CustomerOrderAdmin(ModelAdmin):
     @display(description='Overdue')
     def overdue_flag(self, obj):
         if obj.is_overdue:
-            return format_html(
-                '<span style="color:#dc2626;font-weight:bold">Overdue</span>'
-            )
-        return 'On time'
+            return format_html('<span style="color:#dc2626;font-weight:bold">Overdue</span>')
+        return '—'
 
     def save_model(self, request, obj, form, change):
         if not obj.created_by:
@@ -254,7 +275,7 @@ class OrderItemAdmin(ModelAdmin):
     list_filter = ('item_status', 'garment_type')
     search_fields = ('garment_type', 'description', 'order__customer__first_name',
                      'order__customer__last_name')
-    inlines = [MeasurementInline, OrderItemMaterialInline, WorkTicketInline, DamageIncidentInline]
+    inlines = [MeasurementInline, WorkTicketInline, DamageIncidentInline]
 
     @display(description='Status')
     def item_status_badge(self, obj):
@@ -334,15 +355,13 @@ class WorkTicketAdmin(ModelAdmin):
     @display(description='Assigned To')
     def current_assignee_name(self, obj):
         assignee = obj.current_assignee
-        return assignee.full_name if assignee else 'Unassigned'
+        return assignee.full_name if assignee else '—'
 
     @display(description='Overdue')
     def overdue_flag(self, obj):
         if obj.is_overdue:
-            return format_html(
-                '<span style="color:#dc2626;font-weight:bold">Overdue</span>'
-            )
-        return 'On time'
+            return format_html('<span style="color:#dc2626;font-weight:bold">Overdue</span>')
+        return '—'
 
 
 @admin.register(TaskAssignment)
@@ -362,7 +381,10 @@ class TicketStatusHistoryAdmin(ModelAdmin):
 
     @display(description='Comment')
     def comment_preview(self, obj):
-        return obj.comment[:60] + '…' if len(obj.comment) > 60 else obj.comment
+        text = (obj.comment or '').strip()
+        if len(text) > 60:
+            return text[:60] + '…'
+        return text or '—'
 
 
 @admin.register(DamageIncident)
@@ -402,60 +424,3 @@ class DeliveryAdmin(ModelAdmin):
     list_filter = ('delivery_method', 'is_delivered', 'delivery_date')
     search_fields = ('order__customer__first_name', 'order__customer__last_name', 'received_by')
     date_hierarchy = 'delivery_date'
-
-
-@admin.register(Material)
-class MaterialAdmin(ModelAdmin):
-    list_display = ('name', 'category_badge', 'color', 'default_unit',
-                    'unit_cost', 'supplier', 'is_active', 'usage_count')
-    list_filter = ('category', 'is_active', 'default_unit')
-    search_fields = ('name', 'color', 'supplier', 'notes')
-    fieldsets = (
-        ('Material', {
-            'fields': (('name', 'category'), ('color', 'default_unit'), 'supplier')
-        }),
-        ('Pricing & Status', {
-            'fields': (('unit_cost', 'is_active'),)
-        }),
-        ('Notes', {
-            'fields': ('notes',),
-            'classes': ('collapse',),
-        }),
-    )
-
-    @display(description='Category')
-    def category_badge(self, obj):
-        colors = {
-            'fabric': '#7c3aed',
-            'thread': '#0284c7',
-            'button': '#d97706',
-            'lining': '#6b7280',
-            'zipper': '#059669',
-            'trim': '#db2777',
-            'accessory': '#ea580c',
-            'other': '#475569',
-        }
-        color = colors.get(obj.category, '#6b7280')
-        return format_html(
-            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">{}</span>',
-            color, obj.get_category_display()
-        )
-
-    @display(description='Used in')
-    def usage_count(self, obj):
-        c = obj.usage_records.count()
-        return f"{c} garment(s)"
-
-
-@admin.register(OrderItemMaterial)
-class OrderItemMaterialAdmin(ModelAdmin):
-    list_display = ('material', 'order_item', 'quantity', 'unit', 'effective_color_display', 'created_at')
-    list_filter = ('material__category', 'unit')
-    search_fields = ('material__name', 'order_item__garment_type',
-                     'order_item__order__customer__first_name',
-                     'order_item__order__customer__last_name')
-    autocomplete_fields = ['material', 'order_item']
-
-    @display(description='Color')
-    def effective_color_display(self, obj):
-        return obj.effective_color or 'not set'

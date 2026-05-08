@@ -1,13 +1,17 @@
 {% extends 'employee/base.html' %}
 {% block title %}My Tickets{% endblock %}
 {% block content %}
-<div class="page-header">
-  <h1>My Tickets</h1>
-  <p>All production tickets currently assigned to you</p>
+<div class="cdp-dash-intro">
+  <h1 style="font-size:clamp(1.15rem,2.2vw,1.35rem);margin:0 0 0.25rem;">My tickets</h1>
+  <p style="margin:0;color:var(--e-muted);font-size:0.9rem;">All production tickets currently assigned to you</p>
 </div>
 
-<div class="card">
+<div class="card" style="overflow:hidden;">
+  <div class="card-header">
+    <span class="card-title">Assigned to you</span>
+  </div>
   {% if tickets %}
+  <div style="overflow-x:auto;">
   <table>
     <thead>
       <tr>
@@ -37,16 +41,17 @@
           {{ ticket.get_priority_display }}
         </td>
         <td style="{% if ticket.is_overdue %}color:var(--red);{% endif %}">
-          {% if ticket.deadline %}{{ ticket.deadline|date:"M d, Y" }}{% else %}not set{% endif %}
+          {% if ticket.deadline %}{{ ticket.deadline|date:"M d, Y" }}{% else %}—{% endif %}
         </td>
         <td><a href="{% url 'emp_ticket_detail' ticket.pk %}" class="btn btn-primary btn-sm">Open</a></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}
-  <div style="text-align:center;padding:3rem;color:var(--muted);">
-    <div style="font-size:2rem;margin-bottom:0.75rem;"><i class="bi bi-check-circle"></i></div>
+    <div style="text-align:center;padding:3rem;color:var(--muted);">
+    <div class="mb-2" style="font-size:2rem;opacity:0.35;color:var(--accent);"><i class="bi bi-check2-circle" aria-hidden="true"></i></div>
     <p>No tickets assigned to you right now.</p>
   </div>
   {% endif %}

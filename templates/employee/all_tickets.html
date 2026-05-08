@@ -1,13 +1,13 @@
 {% extends 'employee/base.html' %}
 {% block title %}All Tickets{% endblock %}
 {% block content %}
-<div class="page-header">
-  <h1>All Tickets</h1>
-  <p>Shop wide production tickets across all staff.</p>
+<div class="cdp-dash-intro">
+  <h1 style="font-size:clamp(1.15rem,2.2vw,1.35rem);margin:0 0 0.25rem;">All tickets</h1>
+  <p style="margin:0;color:var(--e-muted);font-size:0.9rem;">Shop-wide production tickets — all staff</p>
 </div>
 
 <!-- FILTERS -->
-<div class="card" style="padding:1rem 1.5rem;">
+<div class="card" style="padding:1rem 1.5rem;margin-bottom:1.15rem;">
   <form method="get" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
     <div class="form-group" style="margin:0;flex:1;min-width:140px;">
       <label>Status</label>
@@ -34,8 +34,9 @@
   </form>
 </div>
 
-<div class="card">
+<div class="card" style="overflow:hidden;">
   {% if tickets %}
+  <div style="overflow-x:auto;">
   <table>
     <thead>
       <tr>
@@ -61,7 +62,7 @@
             {% if ca %}{{ ca.employee.full_name }}{% else %}<span style="color:var(--muted);">Unassigned</span>{% endif %}
           {% endwith %}{% endwith %}
         </td>
-        <td>{{ ticket.current_stage.stage_name|default:"not set" }}</td>
+        <td>{{ ticket.current_stage.stage_name|default:"—" }}</td>
         <td><span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>
         <td><span class="priority-dot priority-{{ ticket.priority }}"></span>{{ ticket.get_priority_display }}</td>
         <td><a href="{% url 'emp_ticket_detail' ticket.pk %}" class="btn btn-outline btn-sm">View</a></td>
@@ -69,6 +70,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
   {% else %}
   <p style="text-align:center;color:var(--muted);padding:2rem;">No tickets found.</p>
   {% endif %}

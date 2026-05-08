@@ -3,14 +3,15 @@
 {% block page_title %}Reports & Monitoring{% endblock %}
 
 {% block content %}
+{% include "includes/workshop_page_intro.html" with title="Reports & monitoring" subtitle="Order health, risk queues, and production signals at a glance." eyebrow="Workshop" %}
 <!-- Order summary -->
 <div class="row g-3 mb-4">
-  <div class="col-12"><h5 style="font-weight:700;color:#1e1b4b">Order Overview</h5></div>
-  {% for key, label in order.STATUS_CHOICES %}
-  <div class="col-6 col-md-4 col-lg-2" style="">
+  <div class="col-12"><p class="workshop-page-intro__eyebrow mb-2">Order overview</p></div>
+  {% for row in order_status_rows %}
+  <div class="col-6 col-md-4 col-lg-2">
     <div class="stat-card text-center">
-      <div class="stat-value" style="font-size:28px">{{ order_stats|default_if_none:'0' }}</div>
-      <div class="stat-label">{{ label }}</div>
+      <div class="stat-value" style="font-size:28px">{{ row.count }}</div>
+      <div class="stat-label">{{ row.label }}</div>
     </div>
   </div>
   {% endfor %}
@@ -21,23 +22,23 @@
   <div class="col-lg-7">
     <div class="card">
       <div class="card-header" style="color:#dc2626">
-        <span style="font-weight:600"><i class="bi bi-exclamation-triangle"></i> Overdue orders ({{ overdue_orders.count }})</span>
+        <span style="font-weight:600"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Overdue orders ({{ overdue_orders.count }})</span>
       </div>
-      <div class="card-body p-0">
+      <div class="shop-table-card card-body p-0 border-0 rounded-0 shadow-none">
         <table class="table table-hover mb-0">
           <thead><tr>
-            <th style="padding-left:16px">Order</th><th>Customer</th><th>Due Date</th><th>Status</th>
+            <th style="padding-left:16px">Order</th><th>Customer</th><th>Due date</th><th>Status</th>
           </tr></thead>
           <tbody>
           {% for order in overdue_orders %}
             <tr>
-              <td style="padding-left:16px"><a href="{% url 'order_detail' order.pk %}" style="color:#7c3aed;font-weight:600">#{{ order.pk }}</a></td>
+              <td style="padding-left:16px"><a href="{% url 'order_detail' order.pk %}" style="color:#845ec2;font-weight:600">#{{ order.pk }}</a></td>
               <td>{{ order.customer.full_name }}</td>
               <td style="color:#dc2626;font-weight:600">{{ order.due_date|date:"M j, Y" }}</td>
               <td><span class="badge-status badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
             </tr>
           {% empty %}
-            <tr><td colspan="4" class="text-center py-3 text-muted">No overdue orders 🎉</td></tr>
+            <tr><td colspan="4" class="text-center py-3 text-muted">No overdue orders.</td></tr>
           {% endfor %}
           </tbody>
         </table>
@@ -47,23 +48,23 @@
     <!-- Unresolved damage incidents -->
     <div class="card mt-4">
       <div class="card-header" style="color:#d97706">
-        <span style="font-weight:600">🪡 Unresolved Damage Incidents ({{ unresolved_incidents.count }})</span>
+        <span style="font-weight:600"><i class="bi bi-wrench-adjustable me-1" aria-hidden="true"></i>Unresolved damage incidents ({{ unresolved_incidents.count }})</span>
       </div>
-      <div class="card-body p-0">
+      <div class="shop-table-card card-body p-0 border-0 rounded-0 shadow-none">
         <table class="table table-hover mb-0">
           <thead><tr>
-            <th style="padding-left:16px">Item</th><th>Type</th><th>Severity</th><th>Reported By</th>
+            <th style="padding-left:16px">Item</th><th>Type</th><th>Severity</th><th>Reported by</th>
           </tr></thead>
           <tbody>
           {% for inc in unresolved_incidents %}
             <tr>
-              <td style="padding-left:16px;font-size:13px">{{ inc.order_item.garment_type }}, {{ inc.order_item.order.customer.full_name }}</td>
+              <td style="padding-left:16px;font-size:13px">{{ inc.order_item.garment_type }} — {{ inc.order_item.order.customer.full_name }}</td>
               <td><span style="color:#dc2626">{{ inc.get_incident_type_display }}</span></td>
               <td>{{ inc.get_severity_display }}</td>
-              <td style="font-size:12px">{{ inc.reported_by.full_name|default:"not set" }}</td>
+              <td style="font-size:12px">{{ inc.reported_by.full_name|default:"—" }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="4" class="text-center py-3 text-muted">No unresolved incidents 🎉</td></tr>
+            <tr><td colspan="4" class="text-center py-3 text-muted">No unresolved incidents.</td></tr>
           {% endfor %}
           </tbody>
         </table>
@@ -75,16 +76,18 @@
   <div class="col-lg-5">
     <!-- Tickets by stage -->
     <div class="card mb-4">
-      <div class="card-header"><span style="font-weight:600">Active Tickets by Stage</span></div>
+      <div class="card-header"><span style="font-weight:600">Active tickets by stage</span></div>
       <div class="card-body">
         {% for stage in tickets_by_stage %}
         <div class="d-flex align-items-center justify-content-between mb-3">
           <div style="font-size:13px">{{ stage.stage_name }}</div>
           <div class="d-flex align-items-center gap-2">
             <div style="background:#ede9fe;border-radius:4px;height:8px;width:100px;overflow:hidden">
-              {% if stage.ticket_count %}<div style="background:#7c3aed;height:100%;width:{{ stage.ticket_count }}0%"></div>{% endif %}
+              {% if stage.ticket_count %}
+              <div style="background:#845ec2;height:100%;width:{% widthratio stage.ticket_count stage_bar_max 100 %}%"></div>
+              {% endif %}
             </div>
-            <span style="font-weight:700;color:#7c3aed;min-width:20px">{{ stage.ticket_count }}</span>
+            <span style="font-weight:700;color:#845ec2;min-width:24px;text-align:right">{{ stage.ticket_count }}</span>
           </div>
         </div>
         {% endfor %}
@@ -93,14 +96,14 @@
 
     <!-- Top customers -->
     <div class="card">
-      <div class="card-header"><span style="font-weight:600">Top Customers</span></div>
-      <div class="card-body p-0">
+      <div class="card-header"><span style="font-weight:600">Top customers</span></div>
+      <div class="shop-table-card card-body p-0 border-0 rounded-0 shadow-none">
         {% for customer in top_customers %}
         <div class="d-flex align-items-center justify-content-between px-4 py-2" style="border-bottom:1px solid #f0ebff">
-          <a href="{% url 'customer_detail' customer.pk %}" style="font-weight:500;color:#7c3aed;font-size:13px">
+          <a href="{% url 'customer_detail' customer.pk %}" style="font-weight:500;color:#845ec2;font-size:13px">
             {{ customer.full_name }}
           </a>
-          <span class="badge" style="background:#ede9fe;color:#7c3aed">{{ customer.order_count }} orders</span>
+          <span class="badge" style="background:#ede9fe;color:#845ec2">{{ customer.order_count }} orders</span>
         </div>
         {% endfor %}
       </div>

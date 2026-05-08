@@ -3,14 +3,21 @@
 
 {% block extra_css %}
 <style>
-  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 1.5rem; }
-  .back-link:hover { color: var(--dark); }
+  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--p-muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .back-link:hover { color: var(--p-ink); }
   .order-hero { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
-  .order-hero h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.25rem; }
-  .order-hero p { color: var(--muted); font-size: 0.9rem; }
+  .order-hero h1 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--p-ink);
+    margin-bottom: 0.35rem;
+  }
+  .order-hero p { color: var(--p-muted); font-size: 0.9rem; }
   .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-  .meta-box { background: #fff; border: 1px solid var(--border); padding: 1.25rem; border-radius: 2px; }
-  .meta-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.3rem; }
+  .meta-box { background: #fff; border: 1px solid var(--border); padding: 1.25rem; border-radius: 16px; }
+  .meta-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.3rem; }
   .meta-val { font-weight: 600; font-size: 0.95rem; }
 
   /* TIMELINE */
@@ -33,32 +40,32 @@
   .tl-time { font-size: 0.78rem; color: var(--muted); }
 
   /* GARMENT CARD */
-  .garment-card { border: 1px solid var(--border); border-radius: 2px; margin-bottom: 1rem; overflow: hidden; }
+  .garment-card { border: 1px solid var(--border); border-radius: 16px; margin-bottom: 1rem; overflow: hidden; }
   .garment-header { background: var(--cream); padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
   .garment-name { font-weight: 600; font-size: 0.95rem; }
   .garment-body { padding: 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
-  .detail-item label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); display: block; margin-bottom: 0.2rem; }
+  .detail-item label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); display: block; margin-bottom: 0.2rem; }
   .detail-item span { font-size: 0.9rem; }
-  .notes-box { grid-column: 1/-1; background: var(--cream); padding: 0.75rem 1rem; border-radius: 2px; font-size: 0.85rem; color: var(--muted); }
+  .notes-box { grid-column: 1/-1; background: var(--cream); padding: 0.75rem 1rem; border-radius: 16px; font-size: 0.85rem; color: var(--muted); }
 
   .delivery-banner {
     background: #f0faf5;
     border: 1px solid #b8dece;
-    border-radius: 2px;
+    border-radius: 16px;
     padding: 1.25rem 1.5rem;
     display: flex;
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
   }
-  .delivery-banner .icon { font-size: 1.8rem; }
+  .delivery-banner .icon { font-size: 1.8rem; color: var(--success); display: flex; align-items: center; }
   .delivery-banner h3 { font-size: 1rem; font-weight: 600; color: var(--success); margin-bottom: 0.2rem; }
   .delivery-banner p { font-size: 0.85rem; color: var(--muted); }
 </style>
 {% endblock %}
 
 {% block content %}
-<a href="{% url 'portal_dashboard' %}" class="back-link"><i class="bi bi-arrow-left"></i> Back to dashboard</a>
+<a href="{% url 'portal_dashboard' %}" class="back-link">← Back to Dashboard</a>
 
 <div class="order-hero">
   <div>
@@ -95,17 +102,17 @@
 <!-- DELIVERY CONFIRMATION -->
 {% if delivery and delivery.is_delivered %}
 <div class="delivery-banner">
-  <span class="icon"><i class="bi bi-check-circle"></i></span>
+  <span class="icon" aria-hidden="true"><i class="bi bi-check-circle-fill"></i></span>
   <div>
-    <h3>Order Delivered!</h3>
-    <p>Delivered on {{ delivery.delivery_date|date:"F j, Y" }} via {{ delivery.delivery_method }}{% if delivery.received_by %}, received by {{ delivery.received_by }}{% endif %}</p>
+    <h3>Delivered</h3>
+    <p>Delivered on {{ delivery.delivery_date|date:"F j, Y" }} via {{ delivery.delivery_method }}{% if delivery.received_by %} — received by {{ delivery.received_by }}{% endif %}</p>
   </div>
 </div>
-{% elif order.status == 'ready_for_delivery' or order.status == 'completed' %}
+{% elif order.status == 'ready' %}
 <div class="delivery-banner" style="background:#fffbf0;border-color:#ffe0a0;">
-  <span class="icon">🎉</span>
+  <span class="icon" style="color:#856404;" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
   <div>
-    <h3 style="color:#856404;">Ready for Collection!</h3>
+    <h3 style="color:#856404;">Ready for collection</h3>
     <p>Your order is complete and ready. We'll be in touch to arrange pickup or delivery.</p>
   </div>
 </div>
@@ -128,29 +135,29 @@
       {% if item.size_label %}<div class="detail-item"><label>Size</label><span>{{ item.size_label }}</span></div>{% endif %}
       <div class="detail-item"><label>Quantity</label><span>{{ item.quantity }}</span></div>
       {% if item.special_instructions %}
-      <div class="notes-box">📝 {{ item.special_instructions }}</div>
+      <div class="notes-box"><i class="bi bi-journal-text me-1" aria-hidden="true"></i>{{ item.special_instructions }}</div>
       {% endif %}
     </div>
 
     <!-- Production Timeline -->
     {% if item.tickets.all %}
     <div style="padding:1.25rem;border-top:1px solid var(--border);">
-      <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;">Production Progress</div>
+      <div style="font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;">Production Progress</div>
       {% for ticket in item.tickets.all %}
       <div style="margin-bottom:1.25rem;">
-        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem;">Ticket {{ ticket.ticket_code }}, <span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span></div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem;">Ticket {{ ticket.ticket_code }} — <span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span></div>
         <div class="timeline">
           {% for history in ticket.status_history.all %}
           <div class="tl-item">
             <div class="tl-dot done"></div>
             <div class="tl-stage">{{ history.stage.stage_name }}</div>
-            <div class="tl-time">{{ history.changed_at|date:"M d, Y, g:i A" }}</div>
+            <div class="tl-time">{{ history.changed_at|date:"M d, Y — g:i A" }}</div>
           </div>
           {% endfor %}
           {% if ticket.current_stage %}
           <div class="tl-item">
             <div class="tl-dot current"></div>
-            <div class="tl-stage">{{ ticket.current_stage.stage_name }} <span style="color:var(--gold);font-size:0.75rem;">(current stage)</span></div>
+            <div class="tl-stage">{{ ticket.current_stage.stage_name }} <span style="color:var(--gold);font-size:0.75rem;">← Current</span></div>
           </div>
           {% endif %}
         </div>

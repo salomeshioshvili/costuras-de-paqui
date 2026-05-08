@@ -15,16 +15,16 @@
         <div class="mb-2">
           <span class="badge-status badge-{{ order.status }}" style="font-size:13px">{{ order.get_status_display }}</span>
           <span class="badge-status badge-{{ order.priority }} ms-1">{{ order.get_priority_display }}</span>
-          {% if order.is_overdue %}<span class="badge" style="background:#fee2e2;color:#dc2626" class="ms-1">Overdue</span>{% endif %}
+          {% if order.is_overdue %}<span class="badge ms-1" style="background:#fee2e2;color:#dc2626">Overdue</span>{% endif %}
         </div>
         <div class="mb-2"><strong>Customer:</strong>
-          <a href="{% url 'customer_detail' order.customer.pk %}" style="color:#7c3aed">{{ order.customer.full_name }}</a>
+          <a href="{% url 'customer_detail' order.customer.pk %}" style="color:#845ec2">{{ order.customer.full_name }}</a>
         </div>
         <div class="mb-2"><strong>Order Date:</strong> {{ order.order_date|date:"M j, Y" }}</div>
         <div class="mb-2"><strong>Due Date:</strong>
           {% if order.due_date %}
             <span {% if order.is_overdue %}style="color:#dc2626;font-weight:600"{% endif %}>{{ order.due_date|date:"M j, Y" }}</span>
-          {% else %}not set{% endif %}
+          {% else %}—{% endif %}
         </div>
         <div class="mb-2"><strong>Payment Option:</strong> {{ order.get_payment_option_display }}</div>
         {% if order.notes %}<div class="mt-2 p-2" style="background:#f8f7ff;border-radius:8px;font-size:13px">{{ order.notes }}</div>{% endif %}
@@ -81,14 +81,14 @@
           {% if not delivery.is_delivered %}
             <form method="post" action="{% url 'delivery_confirm' order.pk %}" class="mt-2">
               {% csrf_token %}
-              <button class="btn btn-success w-100"><i class="bi bi-check2"></i> Confirm delivery</button>
+              <button class="btn btn-success w-100"><i class="bi bi-check2"></i> Confirm Delivery</button>
             </form>
           {% else %}
-            <div class="text-center mt-2"><span style="color:#059669;font-weight:700"><i class="bi bi-check2"></i> Delivered</span></div>
+            <div class="text-center mt-2"><span style="color:#059669;font-weight:700">Delivered</span></div>
           {% endif %}
         {% else %}
           <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#deliveryModal">
-            <i class="bi bi-truck"></i> Schedule delivery
+            <i class="bi bi-truck"></i> Schedule Delivery
           </button>
         {% endif %}
       </div>
@@ -118,14 +118,13 @@
                 · ${{ item.line_total }}
               </div>
               {% if item.special_instructions %}
-                <div style="font-size:12px;color:#7c3aed;margin-top:4px"><i class="bi bi-clipboard-check"></i> {{ item.special_instructions }}</div>
+                <div style="font-size:12px;color:#845ec2;margin-top:4px"><i class="bi bi-chat-left-text me-1" aria-hidden="true"></i>{{ item.special_instructions }}</div>
               {% endif %}
             </div>
             <div class="d-flex gap-1 flex-shrink-0">
               <a href="{% url 'orderitem_edit' item.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
-              <a href="{% url 'ticket_create_for_item' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-receipt"></i> Ticket</a>
-              <a href="{% url 'measurement_add' item.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-rulers"></i> Measure</a>
-              <a href="{% url 'orderitem_material_add' item.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-box-seam"></i> Material</a>
+              <a href="{% url 'ticket_create_for_item' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-ticket-perforated me-1" aria-hidden="true"></i>Ticket</a>
+              <a href="{% url 'measurement_add' item.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-rulers me-1" aria-hidden="true"></i>Measure</a>
             </div>
           </div>
 
@@ -140,35 +139,13 @@
           </div>
           {% endif %}
 
-          <!-- Materials -->
-          {% if item.materials_used.all %}
-          <div class="mt-2">
-              <div style="font-size:11px;color:#6b7280;letter-spacing:0.05em;margin-bottom:4px">
-              Materials
-            </div>
-            <div class="d-flex flex-wrap gap-2">
-              {% for u in item.materials_used.all %}
-                <span style="background:#fef3c7;border-radius:6px;padding:2px 10px;font-size:11px;display:inline-flex;align-items:center;gap:4px">
-                  <i class="bi bi-box-seam"></i>
-                  {{ u.material.name }}{% if u.effective_color %} ({{ u.effective_color }}){% endif %}: {{ u.quantity }} {{ u.get_unit_display }}
-                  <form method="post" action="{% url 'orderitem_material_remove' u.pk %}" style="display:inline;margin-left:4px">
-                    {% csrf_token %}
-                    <button type="submit" style="background:none;border:none;color:#dc2626;padding:0;font-size:11px"
-                            onclick="return confirm('Remove this material from the garment?')"><i class="bi bi-x"></i></button>
-                  </form>
-                </span>
-              {% endfor %}
-            </div>
-          </div>
-          {% endif %}
-
           <!-- Work Tickets -->
           {% if item.tickets.all %}
           <div class="mt-2">
             {% for ticket in item.tickets.all %}
               <a href="{% url 'ticket_detail' ticket.pk %}"
                  style="display:inline-flex;align-items:center;gap:6px;background:#f8f7ff;border:1px solid #e8e4ff;border-radius:8px;padding:4px 10px;font-size:12px;text-decoration:none;color:#4c1d95;margin-right:4px">
-                <i class="bi bi-receipt"></i> {{ ticket.ticket_code }}
+                <i class="bi bi-ticket-perforated me-1" aria-hidden="true"></i>{{ ticket.ticket_code }}
                 <span class="badge-status badge-{{ ticket.status }}" style="font-size:10px">{{ ticket.get_status_display }}</span>
               </a>
             {% endfor %}
@@ -176,7 +153,7 @@
           {% endif %}
         </div>
         {% empty %}
-          <div class="text-center py-5 text-muted">No garments added yet. <a href="{% url 'orderitem_create' order.pk %}">Add one</a>.</div>
+          <div class="text-center py-5 text-muted">No garments added yet. <a href="{% url 'orderitem_create' order.pk %}">Add one →</a></div>
         {% endfor %}
       </div>
     </div>
@@ -197,7 +174,7 @@
               <td style="font-size:13px">{{ p.get_payment_stage_display }}</td>
               <td style="font-size:13px">{{ p.get_payment_method_display }}</td>
               <td style="font-weight:600">${{ p.amount }}</td>
-              <td style="font-size:12px;color:#6b7280">{{ p.reference_code|default:"not set" }}</td>
+              <td style="font-size:12px;color:#6b7280">{{ p.reference_code|default:"—" }}</td>
             </tr>
           {% endfor %}
           </tbody>

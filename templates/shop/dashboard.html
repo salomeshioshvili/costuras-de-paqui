@@ -2,202 +2,337 @@
 {% block title %}Dashboard{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+  .workshop-dash {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 292px;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  @media (max-width: 1199px) {
+    .workshop-dash { grid-template-columns: 1fr; }
+    .workshop-dash__rail { order: -1; }
+  }
+
+  .wd-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+    gap: 1rem;
+    margin: 1.25rem 0 1.5rem;
+  }
+  .wd-metric {
+    border-radius: 22px;
+    padding: 1.15rem 1.1rem 1rem;
+    min-height: 118px;
+    position: relative;
+    border: 1px solid rgba(26, 26, 26, 0.07);
+    overflow: hidden;
+  }
+  .wd-metric--yellow { background: #f2e8b8; }
+  .wd-metric--pink { background: #f5d0e0; }
+  .wd-metric--green { background: #c5d4b8; }
+  .wd-metric--blue { background: #b8c5d8; }
+  .wd-metric__label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(26,26,26,0.55); }
+  .wd-metric__val { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin: 0.2rem 0 0; }
+  .wd-metric__hint { font-size: 0.76rem; color: rgba(26,26,26,0.5); margin-top: 0.35rem; }
+  .wd-metric__chart {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 36px;
+    opacity: 0.35;
+  }
+  .wd-metric__chart span {
+    width: 7px;
+    border-radius: 3px;
+    background: rgba(26,26,26,0.5);
+  }
+
+  .wd-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+  @media (max-width: 991px) { .wd-split { grid-template-columns: 1fr; } }
+
+  .wd-order-list { padding: 0.35rem 0; }
+  .wd-order-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid rgba(26,26,26,0.06);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.12s;
+  }
+  .wd-order-row:hover { background: rgba(248, 200, 220, 0.12); }
+  .wd-order-row:last-child { border-bottom: none; }
+  .wd-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.85rem; color: #fff; flex-shrink: 0;
+  }
+  .wd-avatar.c0 { background: #e8a4bc; }
+  .wd-avatar.c1 { background: #7eb8da; }
+  .wd-avatar.c2 { background: #a8c090; }
+  .wd-avatar.c3 { background: #c4b5fd; }
+  .wd-order-row__main { flex: 1; min-width: 0; }
+  .wd-order-row__title { font-weight: 700; font-size: 0.9rem; }
+  .wd-order-row__sub { font-size: 0.78rem; color: #7a736a; margin-top: 2px; }
+  .wd-pill-time {
+    font-size: 0.72rem; font-weight: 800;
+    padding: 5px 11px; border-radius: 999px;
+    background: var(--primary-light);
+    color: #7a5a6a;
+    flex-shrink: 0;
+  }
+
+  .wd-detail {
+    background: #f5d0e0;
+    border-radius: 22px;
+    padding: 1.35rem 1.35rem 1.25rem;
+    border: 1px solid rgba(26,26,26,0.06);
+  }
+  .wd-detail h3 { font-size: 1rem; font-weight: 800; margin: 0 0 0.35rem; }
+  .wd-detail .wd-meta { font-size: 0.82rem; color: #5c5450; margin-bottom: 0.85rem; }
+  .wd-detail .badge-status { font-size: 0.68rem; }
+
+  .wd-rail-card {
+    background: #fff;
+    border-radius: 22px;
+    border: 1px solid rgba(26,26,26,0.07);
+    padding: 1.1rem 1rem 1rem;
+    margin-bottom: 1rem;
+  }
+  .wd-rail-card h4 { font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #8b837a; margin: 0 0 0.85rem; }
+
+  .mini-cal { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+  .mini-cal th { text-align: center; font-weight: 700; color: #b0a9a0; padding: 4px 2px; }
+  .mini-cal__cell {
+    text-align: center;
+    vertical-align: middle;
+    height: 34px;
+    position: relative;
+    font-weight: 700;
+    color: var(--text-main);
+  }
+  .mini-cal__cell.is-empty { opacity: 0; }
+  .mini-cal__cell.is-today .mini-cal__num {
+    display: inline-flex;
+    width: 28px; height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent-pink);
+    color: #1a1a1a;
+  }
+  .mini-cal__mark { font-size: 5px; color: var(--shop-lilac); display: block; margin: 2px auto 0; }
+
+  .wd-timeline { position: relative; padding-left: 14px; margin-top: 0.35rem; }
+  .wd-timeline::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: rgba(26,26,26,0.08);
+    border-radius: 2px;
+  }
+  .wd-tl-item {
+    position: relative;
+    padding-bottom: 14px;
+    padding-left: 10px;
+  }
+  .wd-tl-item::before {
+    content: '';
+    position: absolute;
+    left: -11px;
+    top: 4px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--accent-pink);
+  }
+  .wd-tl-item__d { font-size: 0.68rem; font-weight: 800; color: #9a928a; text-transform: uppercase; letter-spacing: 0.04em; }
+  .wd-tl-item__t { font-weight: 700; font-size: 0.82rem; margin-top: 2px; }
+  .wd-tl-item__s { font-size: 0.75rem; color: #7a736a; }
+  .wd-tl-item a { color: inherit; text-decoration: none; }
+  .wd-tl-item a:hover { color: var(--shop-lilac); }
+
+  .wd-alert-row { margin-bottom: 1rem; }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Stat cards row 1 -->
-<div class="row g-3 mb-4">
-  <div class="col-6 col-lg-3">
-    <div class="stat-card d-flex align-items-center gap-3">
-      <div class="stat-icon" style="background:#ede9fe;color:#7c3aed"><i class="bi bi-bag"></i></div>
-      <div>
-        <div class="stat-value">{{ total_orders }}</div>
-        <div class="stat-label">Total Orders</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="stat-card d-flex align-items-center gap-3">
-      <div class="stat-icon" style="background:#fef3c7;color:#d97706"><i class="bi bi-gear"></i></div>
-      <div>
-        <div class="stat-value">{{ in_production }}</div>
-        <div class="stat-label">In Production</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="stat-card d-flex align-items-center gap-3">
-      <div class="stat-icon" style="background:#dcfce7;color:#16a34a"><i class="bi bi-check2-circle"></i></div>
-      <div>
-        <div class="stat-value">{{ delivered_orders }}</div>
-        <div class="stat-label">Delivered</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-6 col-lg-3">
-    <div class="stat-card d-flex align-items-center gap-3">
-      <div class="stat-icon" style="background:#fee2e2;color:#dc2626"><i class="bi bi-clock-history"></i></div>
-      <div>
-        <div class="stat-value">{{ overdue_orders }}</div>
-        <div class="stat-label">Overdue Orders</div>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="workshop-dash">
+  <div class="workshop-dash__main">
 
-<!-- Alerts row -->
-{% if overdue_orders or overdue_tickets or damage_count or due_soon %}
-<div class="row g-3 mb-4">
-  {% if overdue_orders %}
-  <div class="col-md-3">
-    <div class="card border-danger" style="border-color:#dc2626 !important">
-      <div class="card-body py-3 d-flex align-items-center gap-3">
-        <span style="font-size:24px"><i class="bi bi-exclamation-triangle"></i></span>
-        <div>
-          <div style="font-weight:700;color:#dc2626">{{ overdue_orders }} Overdue Order{{ overdue_orders|pluralize }}</div>
-          <a href="{% url 'order_list' %}?status=in_production" style="font-size:12px">View</a>
-        </div>
-      </div>
+    <div class="wd-greet">
+      <h1>Good day, {{ request.user.first_name|default:request.user.username }}</h1>
+      <p>Workshop overview — orders, tickets, and what needs attention.</p>
+      <div class="wd-date">{% now "l, F j, Y" %}</div>
     </div>
-  </div>
-  {% endif %}
-  {% if blocked_tickets %}
-  <div class="col-md-3">
-    <div class="card" style="border-color:#dc2626 !important">
-      <div class="card-body py-3 d-flex align-items-center gap-3">
-        <span style="font-size:24px">🚫</span>
-        <div>
-          <div style="font-weight:700;color:#dc2626">{{ blocked_tickets }} Blocked Ticket{{ blocked_tickets|pluralize }}</div>
-          <a href="{% url 'ticket_list' %}?status=blocked" style="font-size:12px">View</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-  {% if damage_count %}
-  <div class="col-md-3">
-    <div class="card" style="border-color:#d97706 !important">
-      <div class="card-body py-3 d-flex align-items-center gap-3">
-        <span style="font-size:24px">🪡</span>
-        <div>
-          <div style="font-weight:700;color:#d97706">{{ damage_count }} Unresolved Incident{{ damage_count|pluralize }}</div>
-          <small style="font-size:12px;color:#6b7280">Check tickets</small>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-  {% if due_soon %}
-  <div class="col-md-3">
-    <div class="card" style="border-color:#0284c7 !important">
-      <div class="card-body py-3 d-flex align-items-center gap-3">
-        <span style="font-size:24px">📅</span>
-        <div>
-          <div style="font-weight:700;color:#0284c7">{{ due_soon }} Due in 3 Days</div>
-          <a href="{% url 'order_list' %}" style="font-size:12px">View</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-</div>
-{% endif %}
 
-<!-- Main content grid -->
-<div class="row g-4">
-  <!-- Recent orders -->
-  <div class="col-lg-7">
-    <div class="card h-100">
-      <div class="card-header d-flex align-items-center justify-content-between">
-        <div style="font-weight:600">Recent Orders</div>
-        <a href="{% url 'order_create' %}" class="btn btn-primary btn-sm">+ New Order</a>
+    <div class="wd-metrics">
+      <div class="wd-metric wd-metric--yellow">
+        <div class="wd-metric__label">Orders</div>
+        <div class="wd-metric__val">{{ total_orders }}</div>
+        <div class="wd-metric__hint">All time in system</div>
+        <div class="wd-metric__chart" aria-hidden="true"><span style="height:40%"></span><span style="height:70%"></span><span style="height:55%"></span><span style="height:85%"></span></div>
       </div>
-      <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-          <thead><tr>
-            <th style="padding-left:16px">Order</th>
-            <th>Customer</th>
-            <th>Due</th>
-            <th>Status</th>
-            <th>Priority</th>
-          </tr></thead>
-          <tbody>
-          {% for order in recent_orders %}
-            <tr {% if order.pk in overdue_ids %}class="overdue-row"{% endif %}>
-              <td style="padding-left:16px">
-                <a href="{% url 'order_detail' order.pk %}" style="font-weight:600;color:#7c3aed">#{{ order.pk }}</a>
-              </td>
-              <td>{{ order.customer.full_name }}</td>
-              <td>
-                {% if order.due_date %}
-                  <span {% if order.is_overdue %}style="color:#dc2626;font-weight:600"{% endif %}>
-                    {{ order.due_date|date:"M j" }}{% if order.is_overdue %} <i class="bi bi-exclamation-triangle"></i>{% endif %}
-                  </span>
-                {% else %}not set{% endif %}
-              </td>
-              <td><span class="badge-status badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
-              <td><span class="badge-status badge-{{ order.priority }}">{{ order.get_priority_display }}</span></td>
-            </tr>
-          {% empty %}
-            <tr><td colspan="5" class="text-center py-4 text-muted">No orders yet.</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
+      <div class="wd-metric wd-metric--pink">
+        <div class="wd-metric__label">In production</div>
+        <div class="wd-metric__val">{{ in_production }}</div>
+        <div class="wd-metric__hint">On the bench</div>
+        <div class="wd-metric__chart" aria-hidden="true"><span style="height:55%"></span><span style="height:45%"></span><span style="height:68%"></span><span style="height:52%"></span></div>
       </div>
-    </div>
-  </div>
-
-  <!-- Right column -->
-  <div class="col-lg-5">
-    <!-- Production stages -->
-    <div class="card mb-4">
-      <div class="card-header"><div style="font-weight:600">Production Pipeline</div></div>
-      <div class="card-body">
-        {% for stage in stages %}
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <div style="font-size:13px;font-weight:500">{{ stage.stage_name }}</div>
-          <div>
-            {% if stage.ticket_count > 0 %}
-              <span class="badge" style="background:#7c3aed;color:#fff">{{ stage.ticket_count }}</span>
-            {% else %}
-              <span style="color:#9ca3af;font-size:12px">,</span>
-            {% endif %}
-          </div>
-        </div>
-        {% endfor %}
+      <div class="wd-metric wd-metric--green">
+        <div class="wd-metric__label">Delivered</div>
+        <div class="wd-metric__val">{{ delivered_orders }}</div>
+        <div class="wd-metric__hint">Completed hand-offs</div>
+        <div class="wd-metric__chart" aria-hidden="true"><span style="height:30%"></span><span style="height:50%"></span><span style="height:45%"></span><span style="height:78%"></span></div>
+      </div>
+      <div class="wd-metric wd-metric--blue">
+        <div class="wd-metric__label">Active tickets</div>
+        <div class="wd-metric__val">{{ open_tickets }}</div>
+        <div class="wd-metric__hint">Open / assigned / in progress</div>
+        <div class="wd-metric__chart" aria-hidden="true"><span style="height:62%"></span><span style="height:38%"></span><span style="height:72%"></span><span style="height:48%"></span></div>
       </div>
     </div>
 
-    <!-- Urgent tickets -->
-    {% if urgent_tickets %}
-    <div class="card">
-      <div class="card-header"><div style="font-weight:600;color:#dc2626">🚨 Urgent Tickets</div></div>
-      <div class="card-body p-0">
-        {% for ticket in urgent_tickets %}
-        <div class="d-flex align-items-center justify-content-between px-4 py-2" style="border-bottom:1px solid #f0ebff">
-          <div>
-            <a href="{% url 'ticket_detail' ticket.pk %}" style="font-weight:600;font-size:13px;color:#7c3aed">
-              {{ ticket.ticket_code }}
-            </a>
-            <div style="font-size:11px;color:#6b7280">{{ ticket.order_item.garment_type }} · {{ ticket.order_item.order.customer.full_name }}</div>
-          </div>
-          <span class="badge-status badge-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
-        </div>
-        {% endfor %}
-      </div>
+    {% if overdue_orders or blocked_tickets or damage_count or due_soon %}
+    <div class="row g-2 wd-alert-row">
+      {% if overdue_orders %}<div class="col-md-6 col-xl-3"><div class="card border-0 h-100" style="background:#fce8ec;"><div class="card-body py-2 px-3 d-flex align-items-center gap-2 small fw-semibold text-danger"><i class="bi bi-exclamation-triangle-fill"></i> {{ overdue_orders }} overdue order{{ overdue_orders|pluralize }}</div></div></div>{% endif %}
+      {% if blocked_tickets %}<div class="col-md-6 col-xl-3"><div class="card border-0 h-100" style="background:#fff0f0;"><div class="card-body py-2 px-3 d-flex align-items-center gap-2 small fw-semibold" style="color:#b91c1c;"><i class="bi bi-pause-circle-fill"></i> {{ blocked_tickets }} blocked</div></div></div>{% endif %}
+      {% if damage_count %}<div class="col-md-6 col-xl-3"><div class="card border-0 h-100" style="background:#faf6e7;"><div class="card-body py-2 px-3 d-flex align-items-center gap-2 small fw-semibold" style="color:#a16207;"><i class="bi bi-wrench-adjustable"></i> {{ damage_count }} incident{{ damage_count|pluralize }}</div></div></div>{% endif %}
+      {% if due_soon %}<div class="col-md-6 col-xl-3"><div class="card border-0 h-100" style="background:#e8f0fa;"><div class="card-body py-2 px-3 d-flex align-items-center gap-2 small fw-semibold text-primary"><i class="bi bi-calendar-event"></i> {{ due_soon }} due in 3 days</div></div></div>{% endif %}
     </div>
     {% endif %}
-  </div>
-</div>
 
-<!-- Quick actions -->
-<div class="row g-3 mt-2">
-  <div class="col-12">
-    <div style="background:#ede9fe;border-radius:12px;padding:16px 20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-      <span style="font-weight:600;color:#5b21b6;font-size:13px">Quick Actions:</span>
-      <a href="{% url 'customer_create' %}" class="btn btn-sm" style="background:white;color:#7c3aed;border:1px solid #c4b5fd">+ New Customer</a>
-      <a href="{% url 'order_create' %}" class="btn btn-sm" style="background:white;color:#7c3aed;border:1px solid #c4b5fd">+ New Order</a>
-      <a href="{% url 'ticket_create' %}" class="btn btn-sm" style="background:white;color:#7c3aed;border:1px solid #c4b5fd">+ New Ticket</a>
-      <a href="{% url 'reports' %}" class="btn btn-sm" style="background:white;color:#7c3aed;border:1px solid #c4b5fd"><i class="bi bi-bar-chart"></i> Reports</a>
+    <div class="wd-split">
+      <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <span class="fw-bold">Recent orders</span>
+          <a href="{% url 'order_create' %}" class="btn btn-primary btn-sm">New order</a>
+        </div>
+        <div class="wd-order-list">
+          {% for order in recent_orders %}
+          <a class="wd-order-row" href="{% url 'order_detail' order.pk %}">
+            <div class="wd-avatar {% cycle 'c0' 'c1' 'c2' 'c3' %}">{{ order.customer.first_name|first }}{{ order.customer.last_name|first }}</div>
+            <div class="wd-order-row__main">
+              <div class="wd-order-row__title">{{ order.customer.full_name }}</div>
+              <div class="wd-order-row__sub">Order #{{ order.pk }} · <span class="badge-status badge-{{ order.status }}">{{ order.get_status_display }}</span></div>
+            </div>
+            <span class="wd-pill-time">
+              {% if order.due_date %}{{ order.due_date|date:"M j" }}{% if order.pk in overdue_ids %} · late{% endif %}{% else %}No due{% endif %}
+            </span>
+          </a>
+          {% empty %}
+          <div class="text-center text-muted py-5">No orders yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        {% if highlight_order %}
+        <div class="wd-detail mb-3">
+          <h3>Order #{{ highlight_order.pk }}</h3>
+          <div class="wd-meta">{{ highlight_order.customer.full_name }} · placed {{ highlight_order.order_date|date:"M j, Y" }}</div>
+          <div class="d-flex flex-wrap gap-1 mb-2">
+            <span class="badge-status badge-{{ highlight_order.status }}">{{ highlight_order.get_status_display }}</span>
+            <span class="badge-status badge-{{ highlight_order.priority }}">{{ highlight_order.get_priority_display }}</span>
+            {% if highlight_order.pk in overdue_ids %}<span class="badge bg-danger">Overdue</span>{% endif %}
+          </div>
+          <a href="{% url 'order_detail' highlight_order.pk %}" class="btn btn-sm btn-dark rounded-pill px-3 mt-1">Open details</a>
+        </div>
+        {% endif %}
+
+        <div class="card">
+          <div class="card-header fw-bold">Production pipeline</div>
+          <div class="card-body py-2">
+            {% for stage in stages %}
+            <div class="d-flex align-items-center justify-content-between py-1 border-bottom border-light">
+              <span class="small fw-semibold">{{ stage.stage_name }}</span>
+              {% if stage.ticket_count %}<span class="badge rounded-pill" style="background:var(--primary-light);color:#7a5a6a;">{{ stage.ticket_count }}</span>{% else %}<span class="text-secondary small">—</span>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if urgent_tickets %}
+        <div class="card mt-3 border-0" style="background: linear-gradient(180deg,#fff 0%,#fef5f7 100%);">
+          <div class="card-header bg-transparent border-0 pb-0 fw-bold text-danger">Urgent queue</div>
+          <div class="card-body pt-2">
+            {% for ticket in urgent_tickets %}
+            <div class="d-flex justify-content-between align-items-center py-2 border-top border-light-subtle">
+              <div>
+                <a href="{% url 'ticket_detail' ticket.pk %}" class="fw-bold small" style="color:var(--shop-lilac);">{{ ticket.ticket_code }}</a>
+                <div class="text-secondary" style="font-size:11px">{{ ticket.order_item.garment_type }}</div>
+              </div>
+              <span class="badge-status badge-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
     </div>
   </div>
+
+  <aside class="workshop-dash__rail">
+    <div class="wd-rail-card">
+      <h4>{{ cal_heading }}</h4>
+      <table class="mini-cal">
+        <thead><tr><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th><th>S</th></tr></thead>
+        <tbody>
+          {% for week in cal_weeks %}
+          <tr>
+            {% for day in week %}
+            <td class="mini-cal__cell {% if not day %}is-empty{% endif %} {% if day and day == today.day %}is-today{% endif %}">
+              {% if day %}
+              <span class="mini-cal__num">{{ day }}</span>
+              {% if day in due_day_numbers %}<i class="mini-cal__mark bi bi-circle-fill" aria-hidden="true"></i>{% endif %}
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <p class="small text-muted mb-0 mt-2" style="font-size:0.7rem;">Dots mark days with due orders.</p>
+    </div>
+
+    <div class="wd-rail-card">
+      <h4>Upcoming dues</h4>
+      {% if rail_items %}
+      <div class="wd-timeline">
+        {% for item in rail_items %}
+        <div class="wd-tl-item">
+          <div class="wd-tl-item__d">{{ item.date|date:"M j" }}</div>
+          <div class="wd-tl-item__t">
+            {% if item.url == 'order_detail' %}
+            <a href="{% url 'order_detail' item.pk %}">{{ item.title }}</a>
+            {% else %}
+            <a href="{% url 'ticket_detail' item.pk %}">{{ item.title }}</a>
+            {% endif %}
+          </div>
+          <div class="wd-tl-item__s">{{ item.sub }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="small text-muted mb-0">No orders or tickets due in the next two weeks.</p>
+      {% endif %}
+    </div>
+
+    <a href="{% url 'reports' %}" class="btn w-100 rounded-pill fw-bold py-2" style="background:#1a1a1a;color:#fff;border:none;">View reports</a>
+  </aside>
 </div>
 {% endblock %}
