@@ -686,7 +686,11 @@ def portal_home(request):
 
 def portal_register(request):
     """Customer self-registration."""
-    if request.user.is_authenticated and not request.user.is_staff:
+    if (
+        request.user.is_authenticated
+        and not request.user.is_staff
+        and Customer.objects.filter(user=request.user).exists()
+    ):
         return redirect('portal_dashboard')
     if request.method == 'POST':
         first_name = request.POST.get('first_name', '').strip()
@@ -728,7 +732,12 @@ def portal_login(request):
     if request.user.is_authenticated:
         if request.user.is_staff:
             return redirect('dashboard')
-        return redirect('portal_dashboard')
+        if Customer.objects.filter(user=request.user).exists():
+            return redirect('portal_dashboard')
+        return render(request, 'portal/login.html', {
+            'error': 'This account is not linked to a customer profile. Please register a customer account or use the staff login.',
+            'email': request.user.email or request.user.username,
+        })
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
@@ -737,7 +746,12 @@ def portal_login(request):
             login(request, user)
             if user.is_staff:
                 return redirect('dashboard')
-            return redirect('portal_dashboard')
+            if Customer.objects.filter(user=user).exists():
+                return redirect('portal_dashboard')
+            return render(request, 'portal/login.html', {
+                'error': 'This account is not linked to a customer profile.',
+                'email': email,
+            })
         else:
             return render(request, 'portal/login.html', {'error': 'Invalid email or password.', 'email': email})
     return render(request, 'portal/login.html')
@@ -828,7 +842,7 @@ def portal_book(request):
             customer=customer,
             due_date=due_date,
             priority=priority,
-            status='pending',
+            status='received',
             payment_status='unpaid',
         )
         OrderItem.objects.create(
@@ -1048,7 +1062,7 @@ def emp_update_stage(request, pk, employee):
         TicketStatusHistory.objects.create(
             ticket=ticket,
             stage=stage,
-            changed_by=request.user,
+            changed_by=employee,
             comment=comment or f"Stage updated by {employee.full_name}"
         )
         messages.success(request, f'Stage updated to "{stage.stage_name}".')
@@ -1065,26 +1079,23 @@ def emp_complete_ticket(request, pk, employee):
     comment = request.POST.get('comment', '').strip()
     ticket.status = 'completed'
     ticket.save()
-    # Try to find a "completed" or last stage
     last_stage = ProductionStage.objects.order_by('-stage_order').first()
     if last_stage:
         TicketStatusHistory.objects.create(
             ticket=ticket,
             stage=last_stage,
-            changed_by=request.user,
+            changed_by=employee,
             comment=comment or f"Completed by {employee.full_name}"
         )
-    # Check if all tickets for this order item are complete
     item = ticket.order_item
     all_done = not item.tickets.exclude(status='completed').exists()
     if all_done:
         item.item_status = 'completed'
         item.save()
-        # Check order
         order = item.order
         if not order.items.exclude(item_status='completed').exists():
-            order.status = 'ready'
-            order.save()
+            order.status = 'ready_for_delivery'
+            order.save(update_fields=['status'])
     messages.success(request, f'Ticket {ticket.ticket_code} marked as completed!')
     return redirect('emp_my_tickets')
 

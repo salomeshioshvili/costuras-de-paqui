@@ -18,7 +18,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if ProductionStage.objects.exists():
-            self.stdout.write('Demo data already exists — skipping seed.')
+            self.stdout.write('Demo data already exists — backfilling missing customer/employee user links only.')
+            self._backfill_user_links()
             return
         self.stdout.write('Seeding demo data...')
 
@@ -81,12 +82,24 @@ class Command(BaseCommand):
         ]
         cust_objs = []
         for fn, ln, phone, email, notes in customers_data:
+            cust_user = None
+            if email:
+                cust_user, created = User.objects.get_or_create(
+                    username=email,
+                    defaults={'email': email, 'first_name': fn, 'last_name': ln},
+                )
+                if created:
+                    cust_user.set_password('customer123')
+                    cust_user.save()
             c, _ = Customer.objects.get_or_create(
                 first_name=fn, last_name=ln,
-                defaults={'phone': phone, 'email': email, 'notes': notes}
+                defaults={'phone': phone, 'email': email, 'notes': notes, 'user': cust_user}
             )
+            if cust_user and not c.user:
+                c.user = cust_user
+                c.save(update_fields=['user'])
             cust_objs.append(c)
-        self.stdout.write(self.style.SUCCESS(f'  [ok] {len(cust_objs)} customers'))
+        self.stdout.write(self.style.SUCCESS(f'  [ok] {len(cust_objs)} customers (demo portal: isabella@email.com / customer123)'))
 
         admin = User.objects.get(username='admin')
         today = date.today()
@@ -223,3 +236,38 @@ class Command(BaseCommand):
         self.stdout.write('  App: http://127.0.0.1:8000/')
         self.stdout.write('  Username: admin')
         self.stdout.write('  Password: admin123')
+
+    def _backfill_user_links(self):
+        """Idempotent: create User accounts and link them to any seeded
+        Customer/Employee that is missing the link. Safe to re-run."""
+        from django.contrib.auth.models import User
+        linked_customers = 0
+        for c in Customer.objects.filter(user__isnull=True).exclude(email=''):
+            user, created = User.objects.get_or_create(
+                username=c.email,
+                defaults={'email': c.email, 'first_name': c.first_name, 'last_name': c.last_name},
+            )
+            if created:
+                user.set_password('customer123')
+                user.save()
+            c.user = user
+            c.save(update_fields=['user'])
+            linked_customers += 1
+        linked_employees = 0
+        for e in Employee.objects.filter(user__isnull=True).exclude(email=''):
+            user, created = User.objects.get_or_create(
+                username=e.email,
+                defaults={'email': e.email, 'first_name': e.first_name, 'last_name': e.last_name},
+            )
+            if created:
+                user.set_password('staff123')
+                user.save()
+            e.user = user
+            e.save(update_fields=['user'])
+            linked_employees += 1
+        if linked_customers or linked_employees:
+            self.stdout.write(self.style.SUCCESS(
+                f'  [ok] Linked users: {linked_customers} customers, {linked_employees} employees.'
+            ))
+        else:
+            self.stdout.write('  [ok] All customers/employees already have user links.')

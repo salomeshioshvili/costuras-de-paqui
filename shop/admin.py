@@ -77,9 +77,14 @@ class CustomerAdmin(ModelAdmin):
     list_filter = ('created_at',)
     search_fields = ('first_name', 'last_name', 'phone', 'email')
     ordering = ('last_name', 'first_name')
+    autocomplete_fields = ['user']
     fieldsets = (
         ('Personal Information', {
             'fields': (('first_name', 'last_name'), ('phone', 'email'), 'address')
+        }),
+        ('Portal Account', {
+            'fields': ('user',),
+            'classes': ('collapse',),
         }),
         ('Notes', {
             'fields': ('notes',),

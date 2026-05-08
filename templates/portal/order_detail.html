@@ -108,7 +108,7 @@
     <p>Delivered on {{ delivery.delivery_date|date:"F j, Y" }} via {{ delivery.delivery_method }}{% if delivery.received_by %} — received by {{ delivery.received_by }}{% endif %}</p>
   </div>
 </div>
-{% elif order.status == 'ready' %}
+{% elif order.status == 'ready_for_delivery' %}
 <div class="delivery-banner" style="background:#fffbf0;border-color:#ffe0a0;">
   <span class="icon" style="color:#856404;" aria-hidden="true"><i class="bi bi-box-seam"></i></span>
   <div>

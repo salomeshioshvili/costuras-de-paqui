@@ -12,6 +12,11 @@ class Customer(models.Model):
     email = models.EmailField(blank=True)
     address = models.TextField(blank=True)
     notes = models.TextField(blank=True)
+    user = models.OneToOneField(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='customer_profile',
+        help_text='Link to a system user account if this customer logs in via the portal',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

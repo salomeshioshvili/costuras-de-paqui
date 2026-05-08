@@ -57,10 +57,9 @@
         <td>{{ ticket.order_item.garment_type }}</td>
         <td>{{ ticket.order_item.order.customer.full_name }}</td>
         <td>
-          {% with ticket.task_assignments.filter as assignments %}
-          {% with ticket.current_assignment as ca %}
-            {% if ca %}{{ ca.employee.full_name }}{% else %}<span style="color:var(--muted);">Unassigned</span>{% endif %}
-          {% endwith %}{% endwith %}
+          {% with ticket.current_assignee as assignee %}
+            {% if assignee %}{{ assignee.full_name }}{% else %}<span style="color:var(--muted);">Unassigned</span>{% endif %}
+          {% endwith %}
         </td>
         <td>{{ ticket.current_stage.stage_name|default:"—" }}</td>
         <td><span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>

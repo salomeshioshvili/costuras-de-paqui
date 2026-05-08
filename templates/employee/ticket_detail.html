@@ -114,7 +114,7 @@
         <div class="tl-item">
           <div class="tl-dot done"></div>
           <div class="tl-stage">{{ h.stage.stage_name }}</div>
-          <div class="tl-time">{{ h.changed_at|date:"M d, Y — g:i A" }}{% if h.changed_by %} · {{ h.changed_by.get_full_name|default:h.changed_by.username }}{% endif %}</div>
+          <div class="tl-time">{{ h.changed_at|date:"M d, Y — g:i A" }}{% if h.changed_by %} · {{ h.changed_by.full_name }}{% endif %}</div>
           {% if h.comment %}<div style="font-size:0.8rem;color:var(--muted);margin-top:0.2rem;">{{ h.comment }}</div>{% endif %}
         </div>
         {% endfor %}
