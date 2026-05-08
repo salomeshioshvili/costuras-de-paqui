@@ -9,6 +9,8 @@ from django.http import JsonResponse
 from decimal import Decimal
 from datetime import timedelta
 from calendar import monthcalendar
+import json
+from pathlib import Path
 
 from .models import (
     Customer, CustomerOrder, OrderItem, Measurement,
@@ -20,6 +22,31 @@ from .forms import (
     WorkTicketForm, TicketStatusUpdateForm, TaskAssignmentForm,
     DamageIncidentForm, PaymentForm, DeliveryForm
 )
+
+
+# region agent log
+DEBUG_LOG_PATH = Path(
+    '/Users/salomeshioshvili/Downloads/sewingshop 3/.cursor/debug-a94f13.log'
+)
+DEBUG_SESSION_ID = 'a94f13'
+
+
+def _append_debug_log(run_id, hypothesis_id, location, message, data):
+    payload = {
+        'sessionId': DEBUG_SESSION_ID,
+        'runId': run_id,
+        'hypothesisId': hypothesis_id,
+        'location': location,
+        'message': message,
+        'data': data,
+        'timestamp': int(timezone.now().timestamp() * 1000),
+    }
+    try:
+        with DEBUG_LOG_PATH.open('a', encoding='utf-8') as log_file:
+            log_file.write(json.dumps(payload, ensure_ascii=True) + '\n')
+    except OSError:
+        return
+# endregion
 
 
 @login_required
@@ -217,6 +244,31 @@ def order_list(request):
         )
 
     overdue_ids = [o.pk for o in orders if o.is_overdue]
+    # region agent log
+    debug_run_id = request.GET.get('debug_run_id', 'initial')
+    preview_orders = []
+    for order in orders.order_by('-created_at')[:5]:
+        preview_orders.append({
+            'orderId': order.pk,
+            'finalAmount': str(order.final_amount),
+            'subtotal': str(order.subtotal_amount),
+            'itemCount': order.items.count(),
+            'status': order.status,
+        })
+    _append_debug_log(
+        run_id=debug_run_id,
+        hypothesis_id='H3_admin_page_without_price_field',
+        location='shop/views.py:order_list',
+        message='Admin order list pricing preview',
+        data={
+            'query': q,
+            'statusFilter': status_filter,
+            'priorityFilter': priority_filter,
+            'resultCount': orders.count(),
+            'previewOrders': preview_orders,
+        },
+    )
+    # endregion
 
     context = {
         'orders': orders.order_by('-created_at'),
@@ -258,6 +310,27 @@ def order_detail(request, pk):
     payments = order.payments.all()
     delivery = getattr(order, 'delivery', None)
     total_paid = payments.aggregate(t=Sum('amount'))['t'] or Decimal('0.00')
+    remaining_balance = order.final_amount - total_paid
+    credit_amount = Decimal('0.00')
+    if remaining_balance < Decimal('0.00'):
+        credit_amount = abs(remaining_balance)
+    # region agent log
+    debug_run_id = request.GET.get('debug_run_id', 'initial')
+    _append_debug_log(
+        run_id=debug_run_id,
+        hypothesis_id='H1_admin_price_missing_in_context',
+        location='shop/views.py:order_detail',
+        message='Admin order detail pricing context',
+        data={
+            'orderId': order.pk,
+            'subtotal': str(order.subtotal_amount),
+            'finalAmount': str(order.final_amount),
+            'paymentStatus': order.payment_status,
+            'totalPaid': str(total_paid),
+            'itemCount': items.count(),
+        },
+    )
+    # endregion
 
     context = {
         'order': order,
@@ -265,7 +338,8 @@ def order_detail(request, pk):
         'payments': payments,
         'delivery': delivery,
         'total_paid': total_paid,
-        'balance': order.final_amount - total_paid,
+        'balance': remaining_balance,
+        'credit_amount': credit_amount,
         'today': timezone.now().date(),
     }
     return render(request, 'shop/order_detail.html', context)
@@ -277,7 +351,8 @@ def order_edit(request, pk):
     if request.method == 'POST':
         form = CustomerOrderForm(request.POST, instance=order)
         if form.is_valid():
-            form.save()
+            order = form.save()
+            order.recalculate_amounts()
             messages.success(request, f'Order #{order.pk} updated.')
             return redirect('order_detail', pk=order.pk)
     else:
@@ -776,6 +851,29 @@ def portal_dashboard(request):
     active = orders.exclude(status__in=['delivered', 'cancelled'])
     completed = orders.filter(status__in=['delivered', 'cancelled'])
     upcoming = active.filter(due_date__isnull=False).order_by('due_date')[:8]
+    # region agent log
+    debug_run_id = request.GET.get('debug_run_id', 'initial')
+    active_preview = []
+    for order in active[:5]:
+        active_preview.append({
+            'orderId': order.pk,
+            'finalAmount': str(order.final_amount),
+            'itemCount': order.items.count(),
+            'status': order.status,
+        })
+    _append_debug_log(
+        run_id=debug_run_id,
+        hypothesis_id='H4_customer_dashboard_without_price_field',
+        location='shop/views.py:portal_dashboard',
+        message='Portal dashboard pricing preview',
+        data={
+            'customerId': customer.pk,
+            'activeCount': active.count(),
+            'completedCount': completed.count(),
+            'activePreview': active_preview,
+        },
+    )
+    # endregion
     return render(request, 'portal/dashboard.html', {
         'customer': customer,
         'active_orders': active,
@@ -800,6 +898,23 @@ def portal_order_detail(request, pk):
         delivery = order.delivery
     except Exception:
         delivery = None
+    # region agent log
+    debug_run_id = request.GET.get('debug_run_id', 'initial')
+    _append_debug_log(
+        run_id=debug_run_id,
+        hypothesis_id='H2_customer_price_hidden_by_template_branch',
+        location='shop/views.py:portal_order_detail',
+        message='Portal order detail pricing context',
+        data={
+            'orderId': order.pk,
+            'finalAmount': str(order.final_amount),
+            'isTruthyFinalAmount': bool(order.final_amount),
+            'paymentStatus': order.payment_status,
+            'deliveryExists': delivery is not None,
+            'itemCount': items.count(),
+        },
+    )
+    # endregion
     return render(request, 'portal/order_detail.html', {
         'order': order, 'items': items, 'delivery': delivery
     })
@@ -852,9 +967,12 @@ def portal_book(request):
             color=color,
             quantity=quantity,
             special_instructions=special_instructions,
-            unit_price=0,
         )
-        messages.success(request, f'Your booking #{order.pk} has been submitted! We will contact you shortly to confirm details and pricing.')
+        order.recalculate_amounts()
+        messages.success(
+            request,
+            f'Your booking #{order.pk} has been submitted and priced automatically.',
+        )
         return redirect('portal_order_detail', pk=order.pk)
 
     return render(request, 'portal/book.html', {'garment_types': GARMENT_TYPES})

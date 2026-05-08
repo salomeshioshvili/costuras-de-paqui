@@ -53,7 +53,7 @@
                 {% if order.due_date %}{{ order.due_date|date:"M j, Y" }}{% else %}—{% endif %}
               </td>
               <td>{{ order.items.count }}</td>
-              <td>${{ order.final_amount }}</td>
+              <td>EUR {{ order.final_amount }}</td>
               <td><span class="badge-status badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
             </tr>
           {% empty %}

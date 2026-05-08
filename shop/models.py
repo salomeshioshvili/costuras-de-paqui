@@ -194,8 +194,12 @@ class CustomerOrder(models.Model):
 
     def recalculate_amounts(self):
         """Recalculate subtotal and final amount from order items."""
+        line_total_expression = models.ExpressionWrapper(
+            (models.F('unit_price') * models.F('quantity')) - models.F('item_discount'),
+            output_field=models.DecimalField(max_digits=12, decimal_places=2),
+        )
         subtotal = self.items.aggregate(
-            total=models.Sum(models.F('unit_price') * models.F('quantity'))
+            total=models.Sum(line_total_expression)
         )['total'] or Decimal('0.00')
         self.subtotal_amount = subtotal
 
@@ -242,6 +246,72 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.garment_type} (Order #{self.order_id}) — {self.get_item_status_display()}"
+
+    @staticmethod
+    def _match_any_keyword(text_value, keywords):
+        normalized_text = (text_value or '').lower()
+        return any(keyword in normalized_text for keyword in keywords)
+
+    def calculate_auto_unit_price(self):
+        garment_text = (self.garment_type or '').lower()
+        description_text = (self.description or '').lower()
+        instructions_text = (self.special_instructions or '').lower()
+        combined_text = ' '.join([garment_text, description_text, instructions_text]).strip()
+
+        if self._match_any_keyword(combined_text, ['original jean hem']):
+            return Decimal('12.00')
+        if self._match_any_keyword(combined_text, ['hemming', 'hem']):
+            if self._match_any_keyword(combined_text, ['dress']):
+                return Decimal('20.00')
+            if self._match_any_keyword(combined_text, ['skirt']):
+                return Decimal('15.00')
+            if self._match_any_keyword(combined_text, ['jean', 'jeans', 'pants', 'trousers']):
+                return Decimal('9.50')
+        if self._match_any_keyword(combined_text, ['waist', 'taking in waist', 'letting out waist']):
+            return Decimal('14.00')
+        if self._match_any_keyword(combined_text, ['zipper', 'zip']):
+            if self._match_any_keyword(combined_text, ['dress', 'skirt']):
+                return Decimal('20.00')
+            return Decimal('12.50')
+        if self._match_any_keyword(combined_text, ['sleeve shortening', 'shortening sleeves']):
+            if self._match_any_keyword(combined_text, ['jacket', 'coat']):
+                return Decimal('20.00')
+            return Decimal('12.50')
+        if self._match_any_keyword(combined_text, ['taking in sides']):
+            if self._match_any_keyword(combined_text, ['jacket', 'coat']):
+                return Decimal('32.50')
+            if self._match_any_keyword(combined_text, ['dress', 'skirt']):
+                return Decimal('25.00')
+            return Decimal('11.50')
+        if self._match_any_keyword(combined_text, ['replacing lining', 'replace lining', 'lining']):
+            return Decimal('52.50')
+        if self._match_any_keyword(combined_text, ['collar', 'turning collar', 'replace collar']):
+            return Decimal('15.00')
+        if self._match_any_keyword(combined_text, ['patch', 'small repair', 'repair']):
+            return Decimal('8.50')
+        if self._match_any_keyword(combined_text, ['button', 'buttons']):
+            return Decimal('2.00')
+
+        if self._match_any_keyword(garment_text, ['wedding gown']):
+            return Decimal('65.00')
+        if self._match_any_keyword(garment_text, ['suit jacket', 'jacket', 'coat']):
+            return Decimal('25.00')
+        if self._match_any_keyword(garment_text, ['dress']):
+            return Decimal('20.00')
+        if self._match_any_keyword(garment_text, ['skirt']):
+            return Decimal('15.00')
+        if self._match_any_keyword(garment_text, ['shirt', 'blouse']):
+            return Decimal('12.00')
+        if self._match_any_keyword(garment_text, ['trousers', 'pants', 'jeans']):
+            return Decimal('10.00')
+        if self._match_any_keyword(garment_text, ['alteration']):
+            return Decimal('12.00')
+
+        return Decimal('15.00')
+
+    def save(self, *args, **kwargs):
+        self.unit_price = self.calculate_auto_unit_price()
+        super().save(*args, **kwargs)
 
     @property
     def line_total(self):
@@ -448,7 +518,7 @@ class Payment(models.Model):
         verbose_name_plural = 'Payments'
 
     def __str__(self):
-        return f"Payment ${self.amount} for Order #{self.order_id} ({self.get_payment_stage_display()})"
+        return f"Payment EUR {self.amount} for Order #{self.order_id} ({self.get_payment_stage_display()})"
 
 
 class Delivery(models.Model):

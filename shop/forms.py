@@ -41,7 +41,7 @@ class OrderItemForm(forms.ModelForm):
     class Meta:
         model = OrderItem
         fields = ['garment_type', 'description', 'fabric', 'color', 'size_label',
-                  'quantity', 'unit_price', 'item_discount', 'special_instructions']
+                  'quantity', 'item_discount', 'special_instructions']
         widgets = {
             'garment_type': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Dress, Suit'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
@@ -49,7 +49,6 @@ class OrderItemForm(forms.ModelForm):
             'color': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. Navy Blue'}),
             'size_label': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. M, 42, Custom'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
-            'unit_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'item_discount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'special_instructions': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
         }

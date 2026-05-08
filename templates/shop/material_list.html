@@ -40,7 +40,7 @@
           <td><span class="badge-status badge-in_production">{{ m.get_category_display }}</span></td>
           <td>{{ m.color|default:"not set" }}</td>
           <td>{{ m.get_default_unit_display }}</td>
-          <td>${{ m.unit_cost }}</td>
+          <td>EUR {{ m.unit_cost }}</td>
           <td style="font-size:13px;color:#6b7280">{{ m.supplier|default:"not set" }}</td>
           <td>{{ m.usage_count }} garment(s)</td>
           <td>

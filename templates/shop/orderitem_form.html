@@ -40,13 +40,12 @@
               <label class="form-label">Quantity</label>
               {{ form.quantity }}
             </div>
-            <div class="col-4">
-              <label class="form-label">Unit Price ($)</label>
-              {{ form.unit_price }}
-            </div>
             <div class="col-6">
-              <label class="form-label">Item Discount ($)</label>
+              <label class="form-label">Item Discount (EUR)</label>
               {{ form.item_discount }}
+            </div>
+            <div class="col-12">
+              <small class="text-muted">Unit price is calculated automatically from garment details.</small>
             </div>
             <div class="col-12">
               <label class="form-label">Special Instructions</label>
