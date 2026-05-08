@@ -109,19 +109,6 @@ Design characteristics:
 - normalized structure to avoid redundancy
 - schema supports order lifecycle and production traceability
 
-See database and ERD documentation in `docs/`.
-
-## Project Documentation (Deliverables)
-
-All required submission documents are available in `docs/`:
-
-1. `01_problem_description.md`
-2. `02_requirements_description.md`
-3. `03_database_design.md`
-4. `04_erd.md`
-5. `05_workflows.md`
-6. `06_changelog.md`
-
 ## Quick Start (SQLite)
 
 ```bash
