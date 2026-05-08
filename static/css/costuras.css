@@ -1,0 +1,435 @@
+/* Costuras de Paqui — shared playful-modern layer */
+
+:root {
+  --cdp-ink: #1e1b2e;
+  --cdp-ink-soft: #3d3658;
+  --cdp-cream: #f3f0e6;
+  --cdp-surface: #fffcf8;
+  --cdp-sidebar: #2c2839;
+  --cdp-sidebar-hover: #3d3750;
+  --cdp-lilac: #9b7ed9;
+  --cdp-accent: #845ec2;
+  --cdp-mint: #7dd3b0;
+  --cdp-lemon: #f5e6a8;
+  --cdp-blush: #f8c8d8;
+  --cdp-sky: #b8d4f0;
+  --cdp-peach: #ffd8c4;
+  --cdp-radius-xl: 22px;
+  --cdp-radius-pill: 999px;
+  --cdp-shadow: 0 12px 40px rgba(44, 40, 57, 0.08);
+  --cdp-font: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+/* --- Dashboard metric grid (inspired by modern admin dashboards) --- */
+.cdp-dash-intro {
+  margin-bottom: 1.5rem;
+}
+.cdp-dash-intro h1 {
+  font-family: var(--cdp-font);
+  font-size: clamp(1.45rem, 2.8vw, 1.85rem);
+  font-weight: 800;
+  color: #1a1a1a;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.25rem;
+  line-height: 1.15;
+}
+.cdp-dash-intro p {
+  margin: 0;
+  color: #6b6560;
+  font-size: 0.92rem;
+}
+
+/* Workshop greet (staff dashboard) — shared typography with inner pages */
+.wd-greet h1 {
+  font-size: clamp(1.45rem, 2.8vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.2rem;
+  color: var(--text-main, #1a1a1a);
+  line-height: 1.15;
+}
+.wd-greet p {
+  margin: 0;
+  color: #6b6560;
+  font-size: 0.92rem;
+}
+.wd-greet .wd-date {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: #9a928a;
+  font-weight: 600;
+}
+
+/* Inner workshop pages — same voice as dashboard greet */
+.workshop-page-intro {
+  margin-bottom: 1.35rem;
+}
+.workshop-page-intro__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b6560;
+  margin: 0 0 0.4rem;
+}
+.workshop-page-intro__title {
+  font-size: clamp(1.45rem, 2.8vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.2rem;
+  color: var(--text-main, #1a1a1a);
+  line-height: 1.15;
+}
+.workshop-page-intro__subtitle {
+  margin: 0;
+  color: #6b6560;
+  font-size: 0.92rem;
+  max-width: 42rem;
+}
+
+.cdp-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.cdp-metric-card {
+  position: relative;
+  border-radius: var(--cdp-radius-xl);
+  padding: 1.35rem 1.25rem;
+  min-height: 128px;
+  overflow: hidden;
+  box-shadow: none;
+  border: 1px solid rgba(30, 27, 46, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cdp-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(44, 40, 57, 0.09);
+}
+
+/* Watermark icon (Bootstrap Icons); replaces emoji decor */
+.cdp-metric-card__icon {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.65rem;
+  font-size: 2.35rem;
+  line-height: 1;
+  opacity: 0.2;
+  color: var(--cdp-ink);
+  pointer-events: none;
+}
+
+.cdp-metric-card__decor {
+  position: absolute;
+  right: -0.5rem;
+  bottom: -0.5rem;
+  font-size: 4.5rem;
+  line-height: 1;
+  opacity: 0.18;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cdp-metric-card__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(30, 27, 46, 0.72);
+  margin-bottom: 0.35rem;
+}
+
+.cdp-metric-card__value {
+  font-family: var(--cdp-font);
+  font-size: 2.15rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cdp-ink);
+  letter-spacing: -0.03em;
+}
+
+.cdp-metric-card__hint {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(30, 27, 46, 0.55);
+}
+
+/* Flat pastel tiles — clean dashboard reference */
+.cdp-metric-card--lemon {
+  background: #ebe4c4;
+}
+.cdp-metric-card--blush {
+  background: #e9c8d4;
+}
+.cdp-metric-card--mint {
+  background: #c5d9c2;
+}
+.cdp-metric-card--sky {
+  background: #b8c5d6;
+}
+
+.cdp-pill-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--cdp-radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--cdp-ink-soft);
+}
+
+/* --- Fun footer --- */
+.cdp-footer {
+  margin-top: auto;
+  background: linear-gradient(180deg, #252230 0%, #1a1824 100%);
+  color: rgba(255, 255, 255, 0.82);
+  position: relative;
+  padding: 2.75rem 1.5rem 2rem;
+  overflow: hidden;
+}
+
+.cdp-footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 14px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 24'%3E%3Cpath fill='%23f7f4ef' d='M0 24V12C240 0 480 24 720 12s480-12 720 0v12H0z'/%3E%3C/svg%3E")
+    no-repeat center top;
+  background-size: 100% 14px;
+}
+
+.cdp-footer__grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  .cdp-footer__grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+.cdp-footer__title {
+  font-family: var(--cdp-font);
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: #fff;
+  margin-bottom: 0.35rem;
+}
+
+.cdp-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.75rem;
+}
+.cdp-footer__links a {
+  color: #d4c8f5;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.cdp-footer__links a:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cdp-footer__tagline-es {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #f8c8d8;
+  font-style: italic;
+}
+
+.cdp-footer__tagline-en {
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 28rem;
+}
+
+.cdp-footer__address {
+  margin: 0 0 1.1rem;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.cdp-footer__address strong {
+  color: #fff;
+  font-weight: 800;
+}
+
+.cdp-footer__map {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: #d4c8f5;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cdp-footer__map:hover {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cdp-footer__prof {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--cdp-radius-xl);
+  padding: 0.85rem 1.1rem;
+  max-width: 380px;
+}
+@media (max-width: 768px) {
+  .cdp-footer__prof {
+    max-width: none;
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.cdp-footer__prof img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 3px solid #f5e6a8;
+  flex-shrink: 0;
+}
+
+.cdp-footer__prof p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.cdp-footer__prof strong {
+  color: #f8c8d8;
+  font-weight: 700;
+}
+
+.cdp-footer__fine {
+  max-width: 1100px;
+  margin: 1.75rem auto 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+}
+
+/* --- Shop / site management (Bootstrap area) — professional, no marketing footer --- */
+.shop-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: #fff;
+  border: 1px solid rgba(26, 26, 26, 0.07);
+  border-radius: var(--cdp-radius-xl);
+  box-shadow: 0 10px 32px rgba(26, 26, 26, 0.05);
+}
+.shop-toolbar form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.shop-table-card {
+  border-radius: var(--cdp-radius-xl);
+  overflow: hidden;
+  border: 1px solid rgba(26, 26, 26, 0.07);
+  box-shadow: 0 12px 40px rgba(26, 26, 26, 0.06);
+  background: #fff;
+}
+
+.shop-table-card .table thead th {
+  background: #faf8ff;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+  font-weight: 800;
+}
+
+/* Team directory cards on workshop employee list */
+.workshop-team-card {
+  border: 1px solid rgba(26, 26, 26, 0.07);
+  border-radius: var(--cdp-radius-xl);
+  background: #fff;
+  box-shadow: 0 10px 32px rgba(26, 26, 26, 0.05);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.workshop-team-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 44px rgba(26, 26, 26, 0.08);
+}
+.workshop-team-card .workshop-team-avatar {
+  width: 56px;
+  height: 56px;
+  background: var(--primary-light, #fdeef4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--shop-lilac, #845ec2);
+}
+
+.shop-app-footer {
+  margin-top: auto;
+  padding: 12px 26px 20px;
+  border-top: 1px solid rgba(232, 224, 245, 0.9);
+  background: rgba(255, 252, 248, 0.85);
+  font-size: 11px;
+  font-weight: 700;
+  color: #8878a8;
+  letter-spacing: 0.02em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.shop-app-footer a {
+  color: #845ec2;
+  text-decoration: none;
+  font-weight: 800;
+}
+.shop-app-footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Employee portal — minimal footer (not customer marketing) */
+.emp-app-footer {
+  padding: 10px 1.5rem 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8878a8;
+  text-align: center;
+  border-top: 1px solid rgba(26, 26, 26, 0.08);
+  background: rgba(253, 247, 240, 0.92);
+}

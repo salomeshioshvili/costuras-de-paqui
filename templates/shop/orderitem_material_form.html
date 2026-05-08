@@ -1,0 +1,54 @@
+{% extends "shop/base.html" %}
+{% block title %}Add Material, {{ item.garment_type }}{% endblock %}
+{% block page_title %}Add Material to {{ item.garment_type }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="mb-3" style="background:#ede9fe;border-radius:10px;padding:12px 16px;font-size:13px">
+      Recording material used for <strong>{{ item.garment_type }}</strong>
+      in <a href="{% url 'order_detail' item.order.pk %}">Order #{{ item.order.pk }}</a>
+      ({{ item.order.customer.full_name }}).
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span style="font-weight:600">Material Used</span></div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Material *</label>
+              {{ form.material }}
+              <div class="form-text">
+                Don't see what you need?
+                <a href="{% url 'material_create' %}">Add a new material to the catalog.</a>
+              </div>
+            </div>
+            <div class="col-4">
+              <label class="form-label">Quantity *</label>
+              {{ form.quantity }}
+            </div>
+            <div class="col-4">
+              <label class="form-label">Unit</label>
+              {{ form.unit }}
+            </div>
+            <div class="col-4">
+              <label class="form-label">Color override</label>
+              {{ form.color_override }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              {{ form.notes }}
+            </div>
+            <div class="col-12 d-flex gap-2 justify-content-end">
+              <a href="{% url 'order_detail' item.order.pk %}" class="btn btn-outline-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Material</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

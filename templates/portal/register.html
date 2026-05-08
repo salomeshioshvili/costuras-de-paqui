@@ -1,0 +1,84 @@
+{% extends 'portal/base.html' %}
+{% block title %}Create Account{% endblock %}
+
+{% block extra_css %}
+<style>
+  main { display: flex; align-items: flex-start; justify-content: center; padding: 3rem 2rem; }
+  .auth-box { width: 100%; max-width: 540px; }
+  .auth-header { text-align: center; margin-bottom: 2rem; }
+  .auth-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .auth-header p { color: var(--muted); font-size: 0.9rem; }
+  .error-list {
+    background: #fdf2f2;
+    border: 1px solid #f5c6cb;
+    border-left: 4px solid var(--danger);
+    padding: 0.85rem 1.25rem;
+    border-radius: 0 2px 2px 0;
+    margin-bottom: 1.5rem;
+  }
+  .error-list li { color: var(--danger); font-size: 0.875rem; list-style: none; padding: 0.15rem 0; }
+  .btn-full { width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.95rem; }
+  .auth-footer { text-align: center; margin-top: 1.5rem; color: var(--muted); font-size: 0.875rem; }
+  .auth-footer a { color: var(--gold); text-decoration: none; font-weight: 500; }
+  .hint { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-box">
+  <div class="card">
+    <div class="auth-header">
+      <h1>Create your account</h1>
+      <p>Start booking custom garments in minutes</p>
+    </div>
+
+    {% if errors %}
+    <ul class="error-list">
+      {% for error_message in errors %}<li><i class="bi bi-exclamation-triangle"></i> {{ error_message }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" name="first_name" value="{{ data.first_name|default:'' }}" placeholder="Jane" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" name="last_name" value="{{ data.last_name|default:'' }}" placeholder="Smith" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address *</label>
+        <input type="email" name="email" value="{{ data.email|default:'' }}" placeholder="jane@email.com" required>
+        <p class="hint">This will be your login username</p>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" name="phone" value="{{ data.phone|default:'' }}" placeholder="+1 555 000 0000">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <textarea name="address" placeholder="Your delivery address (optional)">{{ data.address|default:'' }}</textarea>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" name="password1" placeholder="At least 8 characters" required>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password *</label>
+          <input type="password" name="password2" placeholder="Repeat password" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Create account</button>
+    </form>
+  </div>
+
+  <div class="auth-footer">
+    Already have an account? <a href="{% url 'portal_login' %}">Sign in</a>
+  </div>
+</div>
+{% endblock %}

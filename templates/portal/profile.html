@@ -1,0 +1,63 @@
+{% extends 'portal/base.html' %}
+{% block title %}My Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header { margin-bottom: 2rem; }
+  .page-header h1 {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--p-ink);
+    margin-bottom: 0.35rem;
+  }
+  .page-header p { color: var(--p-muted); }
+  .readonly-field { padding: 0.7rem 1rem; background: #f5f5f5; border: 1.5px solid var(--border); border-radius: 16px; font-size: 0.9rem; color: var(--muted); }
+  .btn-full { width: 100%; justify-content: center; padding: 0.85rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>My Profile</h1>
+  <p>Update your contact details and delivery address.</p>
+</div>
+
+<div class="card" style="max-width:560px;">
+  <!-- Read-only info -->
+  <div class="form-grid" style="margin-bottom:1.25rem;">
+    <div class="form-group">
+      <label>First Name</label>
+      <div class="readonly-field">{{ customer.first_name }}</div>
+    </div>
+    <div class="form-group">
+      <label>Last Name</label>
+      <div class="readonly-field">{{ customer.last_name }}</div>
+    </div>
+  </div>
+  <div class="form-group" style="margin-bottom:1.25rem;">
+    <label>Email</label>
+    <div class="readonly-field">{{ customer.email }}</div>
+  </div>
+  <p style="font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;">Name and email cannot be changed here. Contact our shop to update them.</p>
+  <hr class="divider">
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" name="phone" value="{{ customer.phone }}" placeholder="+1 555 000 0000">
+    </div>
+    <div class="form-group">
+      <label>Delivery Address</label>
+      <textarea name="address">{{ customer.address }}</textarea>
+    </div>
+    <div class="form-group">
+      <label>Preferences / Notes</label>
+      <textarea name="notes" placeholder="e.g. preferred fabrics, allergies, fit preferences...">{{ customer.notes }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+  </form>
+</div>
+{% endblock %}

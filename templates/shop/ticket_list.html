@@ -1,0 +1,72 @@
+{% extends "shop/base.html" %}
+{% block title %}Work Tickets{% endblock %}
+{% block page_title %}Work Tickets{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <form class="d-flex gap-2 flex-wrap" method="get">
+    <input type="text" name="q" value="{{ q }}" class="form-control" style="width:180px" placeholder="Ticket code, garment…">
+    <select name="status" class="form-select" style="width:140px">
+      <option value="">All Statuses</option>
+      {% for val, label in status_choices %}<option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="priority" class="form-select" style="width:130px">
+      <option value="">All Priorities</option>
+      {% for val, label in priority_choices %}<option value="{{ val }}" {% if priority_filter == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="stage" class="form-select" style="width:170px">
+      <option value="">All Stages</option>
+      {% for stage in stages %}<option value="{{ stage.pk }}" {% if stage_filter == stage.pk|stringformat:"s" %}selected{% endif %}>{{ stage.stage_name }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
+    <a href="{% url 'ticket_list' %}" class="btn btn-outline-secondary">Clear</a>
+  </form>
+  <a href="{% url 'ticket_create' %}" class="btn btn-primary">+ New Ticket</a>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead><tr>
+        <th style="padding-left:16px">Ticket</th>
+        <th>Garment</th>
+        <th>Customer</th>
+        <th>Stage</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Assigned To</th>
+        <th>Deadline</th>
+        <th></th>
+      </tr></thead>
+      <tbody>
+      {% for ticket in tickets %}
+        <tr {% if ticket.is_overdue %}class="overdue-row"{% endif %}>
+          <td style="padding-left:16px">
+            <a href="{% url 'ticket_detail' ticket.pk %}" style="font-weight:600;color:#7c3aed">{{ ticket.ticket_code }}</a>
+          </td>
+          <td style="font-size:13px">{{ ticket.order_item.garment_type }}</td>
+          <td style="font-size:13px">{{ ticket.order_item.order.customer.full_name }}</td>
+          <td style="font-size:12px">{{ ticket.current_stage.stage_name|default:"not set" }}</td>
+          <td><span class="badge-status badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>
+          <td><span class="badge-status badge-{{ ticket.priority }}">{{ ticket.get_priority_display }}</span></td>
+          <td style="font-size:12px">
+            {% for a in ticket.assignments.all %}{% if a.assignment_status == 'current' %}{{ a.employee.full_name }}{% endif %}{% endfor %}
+            {% if not ticket.current_assignee %},{% endif %}
+          </td>
+          <td style="font-size:12px">
+            {% if ticket.deadline %}
+              <span {% if ticket.is_overdue %}style="color:#dc2626;font-weight:600"{% endif %}>
+                {{ ticket.deadline|date:"M j" }}{% if ticket.is_overdue %} <i class="bi bi-exclamation-triangle"></i>{% endif %}
+              </span>
+            {% else %}not set{% endif %}
+          </td>
+          <td><a href="{% url 'ticket_detail' ticket.pk %}" class="btn btn-sm btn-outline-primary">View</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="9" class="text-center py-5 text-muted">No tickets found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

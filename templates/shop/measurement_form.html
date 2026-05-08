@@ -1,0 +1,44 @@
+{% extends "shop/base.html" %}
+{% block title %}Add Measurement{% endblock %}
+{% block page_title %}Add Measurement{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-5">
+    <div class="mb-3" style="background:#ede9fe;border-radius:10px;padding:12px 16px;font-size:13px">
+      Measurement for <strong>{{ item.garment_type }}</strong>, Order #{{ item.order.pk }}
+    </div>
+    <div class="card">
+      <div class="card-header"><span style="font-weight:600">Add Measurement</span></div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Measurement Type *</label>
+              {{ form.measurement_type }}
+              <div style="font-size:11px;color:#6b7280;margin-top:4px">e.g. bust, waist, sleeve_length, inseam, shoulder, hip, length</div>
+            </div>
+            <div class="col-8">
+              <label class="form-label">Value *</label>
+              {{ form.measurement_value }}
+            </div>
+            <div class="col-4">
+              <label class="form-label">Unit</label>
+              {{ form.unit }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              {{ form.notes }}
+            </div>
+            <div class="col-12 d-flex gap-2 justify-content-end">
+              <a href="{% url 'order_detail' item.order.pk %}" class="btn btn-outline-secondary">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Measurement</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

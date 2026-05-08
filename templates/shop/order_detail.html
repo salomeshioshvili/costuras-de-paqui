@@ -1,0 +1,306 @@
+{% extends "shop/base.html" %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block page_title %}Order #{{ order.pk }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Left: Order Info -->
+  <div class="col-lg-4">
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span style="font-weight:600">Order Info</span>
+        <a href="{% url 'order_edit' order.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+      </div>
+      <div class="card-body">
+        <div class="mb-2">
+          <span class="badge-status badge-{{ order.status }}" style="font-size:13px">{{ order.get_status_display }}</span>
+          <span class="badge-status badge-{{ order.priority }} ms-1">{{ order.get_priority_display }}</span>
+          {% if order.is_overdue %}<span class="badge" style="background:#fee2e2;color:#dc2626" class="ms-1">Overdue</span>{% endif %}
+        </div>
+        <div class="mb-2"><strong>Customer:</strong>
+          <a href="{% url 'customer_detail' order.customer.pk %}" style="color:#7c3aed">{{ order.customer.full_name }}</a>
+        </div>
+        <div class="mb-2"><strong>Order Date:</strong> {{ order.order_date|date:"M j, Y" }}</div>
+        <div class="mb-2"><strong>Due Date:</strong>
+          {% if order.due_date %}
+            <span {% if order.is_overdue %}style="color:#dc2626;font-weight:600"{% endif %}>{{ order.due_date|date:"M j, Y" }}</span>
+          {% else %}not set{% endif %}
+        </div>
+        <div class="mb-2"><strong>Payment Option:</strong> {{ order.get_payment_option_display }}</div>
+        {% if order.notes %}<div class="mt-2 p-2" style="background:#f8f7ff;border-radius:8px;font-size:13px">{{ order.notes }}</div>{% endif %}
+      </div>
+    </div>
+
+    <!-- Financial summary -->
+    <div class="card mb-3">
+      <div class="card-header"><span style="font-weight:600">Financials</span></div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-1"><span style="color:#6b7280">Subtotal</span><span>${{ order.subtotal_amount }}</span></div>
+        {% if order.order_discount_type != 'none' %}
+        <div class="d-flex justify-content-between mb-1"><span style="color:#6b7280">Discount</span><span style="color:#059669">-{{ order.order_discount_value }}{% if order.order_discount_type == 'percentage' %}%{% endif %}</span></div>
+        {% endif %}
+        <div class="d-flex justify-content-between mb-1" style="font-weight:700"><span>Total</span><span>${{ order.final_amount }}</span></div>
+        <div class="d-flex justify-content-between mb-1"><span style="color:#059669">Paid</span><span style="color:#059669">${{ total_paid }}</span></div>
+        <div class="d-flex justify-content-between" style="font-weight:600;border-top:1px solid #e8e4ff;padding-top:8px;margin-top:4px">
+          <span>Balance</span>
+          <span style="color:{% if balance > 0 %}#dc2626{% else %}#059669{% endif %}">${{ balance }}</span>
+        </div>
+        <div class="mt-2"><span class="badge-status badge-{{ order.payment_status }}">{{ order.get_payment_status_display }}</span></div>
+        <!-- Quick payment -->
+        <button class="btn btn-sm btn-outline-primary mt-3 w-100" data-bs-toggle="modal" data-bs-target="#paymentModal">
+          <i class="bi bi-cash"></i> Record Payment
+        </button>
+      </div>
+    </div>
+
+    <!-- Status change -->
+    <div class="card mb-3">
+      <div class="card-header"><span style="font-weight:600">Update Status</span></div>
+      <div class="card-body">
+        <form method="post" action="{% url 'order_status_update' order.pk %}">
+          {% csrf_token %}
+          <select name="status" class="form-select mb-2">
+            {% for val, label in order.STATUS_CHOICES %}
+              <option value="{{ val }}" {% if order.status == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary w-100">Update Status</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delivery -->
+    <div class="card">
+      <div class="card-header"><span style="font-weight:600">Delivery</span></div>
+      <div class="card-body">
+        {% if delivery %}
+          <div class="mb-1"><strong>Method:</strong> {{ delivery.get_delivery_method_display }}</div>
+          <div class="mb-1"><strong>Date:</strong> {{ delivery.delivery_date|date:"M j, Y" }}</div>
+          {% if delivery.received_by %}<div class="mb-1"><strong>Received by:</strong> {{ delivery.received_by }}</div>{% endif %}
+          {% if delivery.comments %}<div style="font-size:13px;color:#6b7280">{{ delivery.comments }}</div>{% endif %}
+          {% if not delivery.is_delivered %}
+            <form method="post" action="{% url 'delivery_confirm' order.pk %}" class="mt-2">
+              {% csrf_token %}
+              <button class="btn btn-success w-100"><i class="bi bi-check2"></i> Confirm delivery</button>
+            </form>
+          {% else %}
+            <div class="text-center mt-2"><span style="color:#059669;font-weight:700"><i class="bi bi-check2"></i> Delivered</span></div>
+          {% endif %}
+        {% else %}
+          <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#deliveryModal">
+            <i class="bi bi-truck"></i> Schedule delivery
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Garments -->
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span style="font-weight:600">Garments / Items</span>
+        <a href="{% url 'orderitem_create' order.pk %}" class="btn btn-sm btn-primary">+ Add Garment</a>
+      </div>
+      <div class="card-body p-0">
+        {% for item in items %}
+        <div style="border-bottom:1px solid #f0ebff;padding:16px">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div style="font-weight:600;font-size:15px">{{ item.garment_type }}
+                <span class="badge-status badge-{{ item.item_status }} ms-2">{{ item.get_item_status_display }}</span>
+              </div>
+              <div style="font-size:12px;color:#6b7280;margin-top:2px">
+                {% if item.fabric %}Fabric: {{ item.fabric }}{% endif %}
+                {% if item.color %} · Color: {{ item.color }}{% endif %}
+                {% if item.size_label %} · Size: {{ item.size_label }}{% endif %}
+                · Qty: {{ item.quantity }}
+                · ${{ item.line_total }}
+              </div>
+              {% if item.special_instructions %}
+                <div style="font-size:12px;color:#7c3aed;margin-top:4px"><i class="bi bi-clipboard-check"></i> {{ item.special_instructions }}</div>
+              {% endif %}
+            </div>
+            <div class="d-flex gap-1 flex-shrink-0">
+              <a href="{% url 'orderitem_edit' item.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+              <a href="{% url 'ticket_create_for_item' item.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-receipt"></i> Ticket</a>
+              <a href="{% url 'measurement_add' item.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-rulers"></i> Measure</a>
+              <a href="{% url 'orderitem_material_add' item.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-box-seam"></i> Material</a>
+            </div>
+          </div>
+
+          <!-- Measurements -->
+          {% if item.measurements.all %}
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            {% for m in item.measurements.all %}
+              <span style="background:#f0ebff;border-radius:6px;padding:2px 8px;font-size:11px">
+                {{ m.measurement_type }}: {{ m.measurement_value }} {{ m.unit }}
+              </span>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Materials -->
+          {% if item.materials_used.all %}
+          <div class="mt-2">
+              <div style="font-size:11px;color:#6b7280;letter-spacing:0.05em;margin-bottom:4px">
+              Materials
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              {% for u in item.materials_used.all %}
+                <span style="background:#fef3c7;border-radius:6px;padding:2px 10px;font-size:11px;display:inline-flex;align-items:center;gap:4px">
+                  <i class="bi bi-box-seam"></i>
+                  {{ u.material.name }}{% if u.effective_color %} ({{ u.effective_color }}){% endif %}: {{ u.quantity }} {{ u.get_unit_display }}
+                  <form method="post" action="{% url 'orderitem_material_remove' u.pk %}" style="display:inline;margin-left:4px">
+                    {% csrf_token %}
+                    <button type="submit" style="background:none;border:none;color:#dc2626;padding:0;font-size:11px"
+                            onclick="return confirm('Remove this material from the garment?')"><i class="bi bi-x"></i></button>
+                  </form>
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Work Tickets -->
+          {% if item.tickets.all %}
+          <div class="mt-2">
+            {% for ticket in item.tickets.all %}
+              <a href="{% url 'ticket_detail' ticket.pk %}"
+                 style="display:inline-flex;align-items:center;gap:6px;background:#f8f7ff;border:1px solid #e8e4ff;border-radius:8px;padding:4px 10px;font-size:12px;text-decoration:none;color:#4c1d95;margin-right:4px">
+                <i class="bi bi-receipt"></i> {{ ticket.ticket_code }}
+                <span class="badge-status badge-{{ ticket.status }}" style="font-size:10px">{{ ticket.get_status_display }}</span>
+              </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% empty %}
+          <div class="text-center py-5 text-muted">No garments added yet. <a href="{% url 'orderitem_create' order.pk %}">Add one</a>.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Payments table -->
+    {% if payments %}
+    <div class="card">
+      <div class="card-header"><span style="font-weight:600">Payment History</span></div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead><tr>
+            <th style="padding-left:16px">Date</th><th>Stage</th><th>Method</th><th>Amount</th><th>Reference</th>
+          </tr></thead>
+          <tbody>
+          {% for p in payments %}
+            <tr>
+              <td style="padding-left:16px;font-size:13px">{{ p.payment_date|date:"M j, Y" }}</td>
+              <td style="font-size:13px">{{ p.get_payment_stage_display }}</td>
+              <td style="font-size:13px">{{ p.get_payment_method_display }}</td>
+              <td style="font-weight:600">${{ p.amount }}</td>
+              <td style="font-size:12px;color:#6b7280">{{ p.reference_code|default:"not set" }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Record Payment</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form method="post" action="{% url 'payment_add' order.pk %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Date</label>
+              <input type="date" name="payment_date" value="{{ today|date:'Y-m-d' }}" class="form-control" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Amount *</label>
+              <input type="number" name="amount" step="0.01" class="form-control" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Method</label>
+              <select name="payment_method" class="form-select">
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="bank_transfer">Bank Transfer</option>
+                <option value="mobile_payment">Mobile Payment</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Stage</label>
+              <select name="payment_stage" class="form-select">
+                <option value="advance">Advance</option>
+                <option value="deposit">Deposit</option>
+                <option value="partial">Partial</option>
+                <option value="final">Final</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Reference Code</label>
+              <input type="text" name="reference_code" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Payment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delivery Modal -->
+<div class="modal fade" id="deliveryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Schedule Delivery</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <form method="post" action="{% url 'delivery_create' order.pk %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Delivery Date</label>
+              <input type="date" name="delivery_date" value="{{ today|date:'Y-m-d' }}" class="form-control">
+            </div>
+            <div class="col-6">
+              <label class="form-label">Method</label>
+              <select name="delivery_method" class="form-select">
+                <option value="pickup">Customer Pickup</option>
+                <option value="home_delivery">Home Delivery</option>
+                <option value="courier">Courier Service</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Received By</label>
+              <input type="text" name="received_by" class="form-control" placeholder="Name of person receiving">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Comments</label>
+              <textarea name="comments" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="is_delivered" id="isDelivered">
+                <label class="form-check-label" for="isDelivered">Mark as delivered immediately</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

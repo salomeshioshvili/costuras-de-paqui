@@ -1,0 +1,6 @@
+{# Shared intro strip for workshop inner pages (matches dashboard greet typography). #}
+<div class="workshop-page-intro">
+  {% if eyebrow %}<p class="workshop-page-intro__eyebrow">{{ eyebrow }}</p>{% endif %}
+  <h1 class="workshop-page-intro__title">{{ title }}</h1>
+  {% if subtitle %}<p class="workshop-page-intro__subtitle">{{ subtitle }}</p>{% endif %}
+</div>

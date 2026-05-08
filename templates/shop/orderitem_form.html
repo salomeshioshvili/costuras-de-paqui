@@ -1,0 +1,67 @@
+{% extends "shop/base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    {% if order %}
+    <div class="mb-3" style="background:#ede9fe;border-radius:10px;padding:12px 16px;font-size:13px">
+      Adding garment to <strong>Order #{{ order.pk }}</strong>, {{ order.customer.full_name }}
+    </div>
+    {% endif %}
+    <div class="card">
+      <div class="card-header"><span style="font-weight:600">{{ title }}</span></div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Garment Type *</label>
+              {{ form.garment_type }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description</label>
+              {{ form.description }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Fabric</label>
+              {{ form.fabric }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Color</label>
+              {{ form.color }}
+            </div>
+            <div class="col-4">
+              <label class="form-label">Size Label</label>
+              {{ form.size_label }}
+            </div>
+            <div class="col-4">
+              <label class="form-label">Quantity</label>
+              {{ form.quantity }}
+            </div>
+            <div class="col-4">
+              <label class="form-label">Unit Price ($)</label>
+              {{ form.unit_price }}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Item Discount ($)</label>
+              {{ form.item_discount }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Special Instructions</label>
+              {{ form.special_instructions }}
+            </div>
+            <div class="col-12 d-flex gap-2 justify-content-end">
+              {% if order %}
+              <a href="{% url 'order_detail' order.pk %}" class="btn btn-outline-secondary">Cancel</a>
+              {% endif %}
+              <button type="submit" class="btn btn-primary">Save Garment</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

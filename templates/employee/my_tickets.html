@@ -1,0 +1,54 @@
+{% extends 'employee/base.html' %}
+{% block title %}My Tickets{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>My Tickets</h1>
+  <p>All production tickets currently assigned to you</p>
+</div>
+
+<div class="card">
+  {% if tickets %}
+  <table>
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Garment</th>
+        <th>Customer</th>
+        <th>Current Stage</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Deadline</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ticket in tickets %}
+      <tr>
+        <td><code style="color:var(--accent);font-family:'DM Mono',monospace;font-size:0.8rem;">{{ ticket.ticket_code }}</code></td>
+        <td>
+          {{ ticket.order_item.garment_type }}
+          {% if ticket.order_item.color %}<span style="color:var(--muted);font-size:0.8rem;">· {{ ticket.order_item.color }}</span>{% endif %}
+        </td>
+        <td>{{ ticket.order_item.order.customer.full_name }}</td>
+        <td>{{ ticket.current_stage.stage_name|default:"Not set" }}</td>
+        <td><span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span></td>
+        <td>
+          <span class="priority-dot priority-{{ ticket.priority }}"></span>
+          {{ ticket.get_priority_display }}
+        </td>
+        <td style="{% if ticket.is_overdue %}color:var(--red);{% endif %}">
+          {% if ticket.deadline %}{{ ticket.deadline|date:"M d, Y" }}{% else %}not set{% endif %}
+        </td>
+        <td><a href="{% url 'emp_ticket_detail' ticket.pk %}" class="btn btn-primary btn-sm">Open</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div style="text-align:center;padding:3rem;color:var(--muted);">
+    <div style="font-size:2rem;margin-bottom:0.75rem;"><i class="bi bi-check-circle"></i></div>
+    <p>No tickets assigned to you right now.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

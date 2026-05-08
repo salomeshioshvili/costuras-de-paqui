@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}StitchPro Staff{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3347;
+      --accent: #4f8ef7;
+      --accent2: #7c5cfc;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --text: #e8eaf0;
+      --muted: #6b7280;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP BAR */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-brand {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .topbar-brand .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+    .topbar-user {
+      font-size: 0.82rem;
+      color: var(--muted);
+      padding: 0.35rem 0.75rem;
+    }
+    .topbar-right a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .topbar-right a:hover { background: var(--surface2); color: var(--text); }
+
+    /* LAYOUT */
+    .layout { display: flex; flex: 1; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1rem 0.75rem;
+      min-height: calc(100vh - 56px);
+      flex-shrink: 0;
+    }
+    .nav-section {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      padding: 0.5rem 0.5rem 0.25rem;
+      margin-top: 0.75rem;
+    }
+    .nav-section:first-child { margin-top: 0; }
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+      margin-bottom: 0.15rem;
+    }
+    .sidebar a:hover { background: var(--surface2); color: var(--text); }
+    .sidebar a.active { background: rgba(79,142,247,0.12); color: var(--accent); }
+    .sidebar .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    /* MAIN */
+    .main { flex: 1; padding: 2rem; max-width: 1100px; }
+
+    /* MESSAGES */
+    .messages { margin-bottom: 1.25rem; }
+    .msg {
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid;
+    }
+    .msg-success { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.3); color: #86efac; }
+    .msg-error { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+    .msg-info { background: rgba(79,142,247,0.1); border-color: rgba(79,142,247,0.3); color: #93c5fd; }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title { font-size: 0.95rem; font-weight: 600; }
+
+    /* STAT BOXES */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+    .stat-num { font-size: 1.8rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem; }
+    .stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.06em; }
+    .stat-blue .stat-num { color: var(--accent); }
+    .stat-green .stat-num { color: var(--green); }
+    .stat-yellow .stat-num { color: var(--yellow); }
+    .stat-red .stat-num { color: var(--red); }
+
+    /* BADGES */
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      }
+    .badge-open { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-assigned { background: rgba(79,142,247,0.15); color: #7db3ff; }
+    .badge-in_progress { background: rgba(124,92,252,0.15); color: #a78bfa; }
+    .badge-completed { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .badge-blocked { background: rgba(239,68,68,0.15); color: #f87171; }
+    .badge-pending { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-in_production { background: rgba(124,92,252,0.15); color: #a78bfa; }
+    .badge-ready { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .badge-delivered { background: rgba(79,142,247,0.15); color: #7db3ff; }
+    .badge-normal { background: rgba(107,114,128,0.2); color: #9ca3af; }
+    .badge-high { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-urgent { background: rgba(239,68,68,0.15); color: #f87171; }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem; border-radius: 6px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; border: none; text-decoration: none; transition: all 0.15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #3a7ce8; }
+    .btn-success { background: var(--green); color: #fff; }
+    .btn-success:hover { opacity: 0.9; }
+    .btn-danger { background: var(--red); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 0.3rem 0.7rem; font-size: 0.78rem; }
+
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+    td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* FORM */
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 0.35rem; }
+    input, select, textarea {
+      width: 100%; padding: 0.6rem 0.85rem;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      outline: none; transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* PRIORITY INDICATOR */
+    .priority-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .priority-normal { background: var(--muted); }
+    .priority-high { background: var(--yellow); }
+    .priority-urgent { background: var(--red); }
+
+    /* PAGE HEADER */
+    .page-header { margin-bottom: 1.75rem; }
+    .page-header h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .page-header p { color: var(--muted); font-size: 0.875rem; }
+
+    /* TIMELINE */
+    .timeline { padding-left: 1.5rem; position: relative; }
+    .timeline::before { content:''; position:absolute; left:0.4rem; top:4px; bottom:4px; width:2px; background:var(--border); }
+    .tl-item { position: relative; margin-bottom: 1rem; }
+    .tl-dot { position:absolute; left:-1.2rem; top:4px; width:10px; height:10px; border-radius:50%; border:2px solid var(--border); background:var(--surface); }
+    .tl-dot.done { background:var(--accent); border-color:var(--accent); }
+    .tl-dot.current { background:var(--green); border-color:var(--green); box-shadow:0 0 0 3px rgba(34,197,94,0.2); }
+    .tl-stage { font-size:0.875rem; font-weight:600; }
+    .tl-time { font-size:0.75rem; color:var(--muted); }
+
+    option { background: var(--surface2); }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<div class="topbar">
+  <a href="{% url 'emp_dashboard' %}" class="topbar-brand">
+    <span class="dot"></span> StitchPro <span style="color:var(--muted);font-weight:400;">Staff</span>
+  </a>
+  <div class="topbar-right">
+    {% if employee %}
+    <span class="topbar-user">👤 {{ employee.full_name }} · {{ employee.get_role_display }}</span>
+    {% endif %}
+    <a href="{% url 'portal_home' %}">Customer Site</a>
+    <a href="{% url 'emp_logout' %}">Sign Out</a>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="nav-section">Overview</div>
+    <a href="{% url 'emp_dashboard' %}" class="{% if request.resolver_match.url_name == 'emp_dashboard' %}active{% endif %}">
+      <span class="icon"><i class="bi bi-grid-1x2"></i></span> Dashboard
+    </a>
+
+    <div class="nav-section">My Work</div>
+    <a href="{% url 'emp_my_tickets' %}" class="{% if 'my_tickets' in request.resolver_match.url_name %}active{% endif %}">
+      <span class="icon"><i class="bi bi-ticket-detailed"></i></span> My tickets
+    </a>
+    <a href="{% url 'emp_all_tickets' %}" class="{% if 'all_tickets' in request.resolver_match.url_name %}active{% endif %}">
+      <span class="icon"><i class="bi bi-list-check"></i></span> All tickets
+    </a>
+    <a href="{% url 'emp_orders' %}" class="{% if 'emp_orders' in request.resolver_match.url_name %}active{% endif %}">
+      <span class="icon"><i class="bi bi-box-seam"></i></span> Orders
+    </a>
+
+    <div class="nav-section">Account</div>
+    <a href="{% url 'emp_profile' %}" class="{% if 'emp_profile' in request.resolver_match.url_name %}active{% endif %}">
+      <span class="icon">👤</span> My Profile
+    </a>
+  </nav>
+
+  <main class="main">
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="msg msg-{{ message.tags|default:'info' }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+</body>
+</html>

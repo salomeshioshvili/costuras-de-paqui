@@ -1,0 +1,45 @@
+{% extends 'employee/base.html' %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="cdp-dash-intro">
+  <h1 style="font-size:clamp(1.15rem,2.2vw,1.35rem);margin:0 0 0.25rem;">Active orders</h1>
+  <p style="margin:0;color:var(--e-muted);font-size:0.9rem;">All shop orders currently in production</p>
+</div>
+
+<div class="card" style="overflow:hidden;">
+  {% if orders %}
+  <div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Customer</th>
+        <th>Items</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Due Date</th>
+        <th>Payment</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td style="font-weight:600;">#{{ order.pk }}</td>
+        <td>{{ order.customer.full_name }}</td>
+        <td>{{ order.items.count }}</td>
+        <td><span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span></td>
+        <td><span class="priority-dot priority-{{ order.priority }}"></span>{{ order.get_priority_display }}</td>
+        <td style="{% if order.is_overdue %}color:var(--red);{% endif %}">
+          {% if order.due_date %}{{ order.due_date|date:"M d, Y" }}{% else %}not set{% endif %}
+        </td>
+        <td><span class="badge badge-{{ order.payment_status }}">{{ order.get_payment_status_display }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <p style="text-align:center;color:var(--muted);padding:2rem;">No active orders found.</p>
+  {% endif %}
+</div>
+{% endblock %}

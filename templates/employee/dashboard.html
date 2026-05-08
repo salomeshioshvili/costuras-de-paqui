@@ -1,0 +1,89 @@
+{% extends 'employee/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Good to see you, {{ employee.first_name }} 👋</h1>
+  <p>{{ employee.get_role_display }} · Here's your work overview for today</p>
+</div>
+
+<div class="stats-row">
+  <div class="stat stat-blue">
+    <div class="stat-num">{{ my_open }}</div>
+    <div class="stat-label">My Open Tickets</div>
+  </div>
+  <div class="stat stat-yellow">
+    <div class="stat-num">{{ my_urgent }}</div>
+    <div class="stat-label">Urgent</div>
+  </div>
+  <div class="stat stat-green">
+    <div class="stat-num">{{ my_done_today }}</div>
+    <div class="stat-label">Completed Today</div>
+  </div>
+  <div class="stat stat-red">
+    <div class="stat-num">{{ shop_overdue }}</div>
+    <div class="stat-label">Shop Overdue</div>
+  </div>
+</div>
+
+<!-- MY ASSIGNED TICKETS -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title"><i class="bi bi-ticket-detailed"></i> My assigned tickets</span>
+    <a href="{% url 'emp_my_tickets' %}" class="btn btn-outline btn-sm">View All</a>
+  </div>
+  {% if my_tickets %}
+  <table>
+    <thead>
+      <tr>
+        <th>Ticket</th>
+        <th>Garment</th>
+        <th>Customer</th>
+        <th>Stage</th>
+        <th>Priority</th>
+        <th>Deadline</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ticket in my_tickets %}
+      <tr>
+        <td><code style="color:var(--accent);font-family:'DM Mono',monospace;font-size:0.8rem;">{{ ticket.ticket_code }}</code></td>
+        <td>{{ ticket.order_item.garment_type }}</td>
+        <td>{{ ticket.order_item.order.customer.full_name }}</td>
+        <td>{{ ticket.current_stage.stage_name|default:"not set" }}</td>
+        <td>
+          <span class="priority-dot priority-{{ ticket.priority }}"></span>
+          {{ ticket.get_priority_display }}
+        </td>
+        <td>
+          {% if ticket.deadline %}
+            {% if ticket.is_overdue %}<span style="color:var(--red);">overdue {% endif %}
+            {{ ticket.deadline|date:"M d" }}
+            {% if ticket.is_overdue %}</span>{% endif %}
+          {% else %}not set{% endif %}
+        </td>
+        <td><a href="{% url 'emp_ticket_detail' ticket.pk %}" class="btn btn-outline btn-sm">Update</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:var(--muted);padding:1rem 0;text-align:center;">No tickets assigned to you right now.</p>
+  {% endif %}
+</div>
+
+<!-- SHOP PIPELINE -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">🏭 Shop Production Pipeline</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;">
+    {% for stage in pipeline %}
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:1rem;text-align:center;">
+      <div style="font-size:1.4rem;font-weight:700;color:var(--accent);">{{ stage.ticket_count }}</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:0.25rem;">{{ stage.stage_name }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

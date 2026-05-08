@@ -1,0 +1,112 @@
+{% extends 'portal/base.html' %}
+{% block title %}Book a Garment{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header { margin-bottom: 2rem; }
+  .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.25rem; }
+  .page-header p { color: var(--muted); }
+  .section-label {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 1rem;
+    padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+  }
+  .radio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem; }
+  .radio-option input[type=radio] { display: none; }
+  .radio-option label {
+    display: block; padding: 0.65rem 1rem; border: 1.5px solid var(--border);
+    border-radius: 2px; cursor: pointer; font-size: 0.85rem; text-align: center;
+    transition: all 0.15s; background: var(--warm-white); color: var(--dark);
+    text-transform: none; letter-spacing: 0; font-weight: 400;
+  }
+  .radio-option input:checked + label { border-color: var(--gold); background: #fffbf0; font-weight: 600; color: var(--dark); }
+  .radio-option label:hover { border-color: var(--gold-light); }
+  .form-note { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+  .btn-full { width: 100%; justify-content: center; padding: 0.9rem; font-size: 0.95rem; }
+  .error-box { background:#fdf2f2;border:1px solid #f5c6cb;border-left:4px solid var(--danger);color:var(--danger);padding:0.85rem 1.25rem;border-radius:0 2px 2px 0;margin-bottom:1.5rem;font-size:0.875rem; }
+  .info-box { background:#f0f6fa;border:1px solid #b8d0e0;border-left:4px solid var(--info);color:var(--info);padding:0.85rem 1.25rem;border-radius:0 2px 2px 0;margin-bottom:1.5rem;font-size:0.875rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Book a New Garment</h1>
+  <p>Fill in the details below and our team will confirm pricing and schedule.</p>
+</div>
+
+<div class="info-box">
+  ℹ Your booking will be reviewed by our team. We will contact you to confirm measurements, pricing, and scheduling before production begins.
+</div>
+
+{% if error %}
+<div class="error-box"><i class="bi bi-exclamation-triangle"></i> {{ error }}</div>
+{% endif %}
+
+<div class="card">
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- GARMENT TYPE -->
+    <div class="section-label">Garment Type *</div>
+    <div class="radio-grid">
+      {% for g in garment_types %}
+      <div class="radio-option">
+        <input type="radio" name="garment_type" id="gt_{{ forloop.counter }}" value="{{ g }}" {% if data.garment_type == g %}checked{% endif %} required>
+        <label for="gt_{{ forloop.counter }}">{{ g }}</label>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- DETAILS -->
+    <div class="section-label" style="margin-top:1.5rem;">Fabric & Style</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Fabric / Material</label>
+        <input type="text" name="fabric" value="{{ data.fabric|default:'' }}" placeholder="e.g. Silk, Cotton, Linen">
+      </div>
+      <div class="form-group">
+        <label>Color</label>
+        <input type="text" name="color" value="{{ data.color|default:'' }}" placeholder="e.g. Navy Blue, Ivory">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Special Instructions / Design Notes</label>
+      <textarea name="special_instructions" placeholder="Describe any design details, patterns, embellishments, or special requirements...">{{ data.special_instructions|default:'' }}</textarea>
+    </div>
+
+    <!-- SCHEDULING -->
+    <div class="section-label" style="margin-top:0.5rem;">Scheduling</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Requested Due Date *</label>
+        <input type="date" name="due_date" value="{{ data.due_date|default:'' }}" required>
+        <p class="form-note">We'll confirm if this date is achievable.</p>
+      </div>
+      <div class="form-group">
+        <label>Quantity</label>
+        <input type="number" name="quantity" value="{{ data.quantity|default:'1' }}" min="1" max="50">
+      </div>
+    </div>
+
+    <!-- PRIORITY -->
+    <div class="section-label" style="margin-top:0.5rem;">Priority</div>
+    <div class="radio-grid" style="grid-template-columns:repeat(3,1fr);max-width:400px;">
+      <div class="radio-option">
+        <input type="radio" name="priority" id="p_normal" value="normal" {% if data.priority != 'high' and data.priority != 'urgent' %}checked{% endif %}>
+        <label for="p_normal">Normal</label>
+      </div>
+      <div class="radio-option">
+        <input type="radio" name="priority" id="p_high" value="high" {% if data.priority == 'high' %}checked{% endif %}>
+        <label for="p_high">High</label>
+      </div>
+      <div class="radio-option">
+        <input type="radio" name="priority" id="p_urgent" value="urgent" {% if data.priority == 'urgent' %}checked{% endif %}>
+        <label for="p_urgent">Urgent</label>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem;">
+      <button type="submit" class="btn btn-primary btn-full">✦ Submit Booking</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

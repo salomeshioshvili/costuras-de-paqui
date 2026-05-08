@@ -1,0 +1,168 @@
+{% extends 'portal/base.html' %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--muted); text-decoration: none; font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .back-link:hover { color: var(--dark); }
+  .order-hero { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
+  .order-hero h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.25rem; }
+  .order-hero p { color: var(--muted); font-size: 0.9rem; }
+  .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .meta-box { background: #fff; border: 1px solid var(--border); padding: 1.25rem; border-radius: 2px; }
+  .meta-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.3rem; }
+  .meta-val { font-weight: 600; font-size: 0.95rem; }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before { content: ''; position: absolute; left: 0.55rem; top: 0.5rem; bottom: 0.5rem; width: 2px; background: var(--border); }
+  .tl-item { position: relative; margin-bottom: 1.25rem; }
+  .tl-dot {
+    position: absolute;
+    left: -1.65rem;
+    top: 0.2rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2.5px solid var(--border);
+    background: #fff;
+  }
+  .tl-dot.done { background: var(--gold); border-color: var(--gold); }
+  .tl-dot.current { background: var(--dark); border-color: var(--dark); box-shadow: 0 0 0 3px rgba(26,18,8,0.15); }
+  .tl-stage { font-weight: 600; font-size: 0.9rem; }
+  .tl-time { font-size: 0.78rem; color: var(--muted); }
+
+  /* GARMENT CARD */
+  .garment-card { border: 1px solid var(--border); border-radius: 2px; margin-bottom: 1rem; overflow: hidden; }
+  .garment-header { background: var(--cream); padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+  .garment-name { font-weight: 600; font-size: 0.95rem; }
+  .garment-body { padding: 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 1.5rem; }
+  .detail-item label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); display: block; margin-bottom: 0.2rem; }
+  .detail-item span { font-size: 0.9rem; }
+  .notes-box { grid-column: 1/-1; background: var(--cream); padding: 0.75rem 1rem; border-radius: 2px; font-size: 0.85rem; color: var(--muted); }
+
+  .delivery-banner {
+    background: #f0faf5;
+    border: 1px solid #b8dece;
+    border-radius: 2px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .delivery-banner .icon { font-size: 1.8rem; }
+  .delivery-banner h3 { font-size: 1rem; font-weight: 600; color: var(--success); margin-bottom: 0.2rem; }
+  .delivery-banner p { font-size: 0.85rem; color: var(--muted); }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'portal_dashboard' %}" class="back-link"><i class="bi bi-arrow-left"></i> Back to dashboard</a>
+
+<div class="order-hero">
+  <div>
+    <h1>Order #{{ order.pk }}</h1>
+    <p>Placed {{ order.order_date|date:"F j, Y" }}</p>
+  </div>
+  <span class="badge badge-{{ order.status }}" style="font-size:0.85rem;padding:0.4rem 1rem;">{{ order.get_status_display }}</span>
+</div>
+
+<!-- META -->
+<div class="meta-grid">
+  <div class="meta-box">
+    <div class="meta-label">Order Date</div>
+    <div class="meta-val">{{ order.order_date|date:"M d, Y" }}</div>
+  </div>
+  <div class="meta-box">
+    <div class="meta-label">Due Date</div>
+    <div class="meta-val">{% if order.due_date %}{{ order.due_date|date:"M d, Y" }}{% else %}TBD{% endif %}</div>
+  </div>
+  <div class="meta-box">
+    <div class="meta-label">Priority</div>
+    <div class="meta-val">{{ order.get_priority_display }}</div>
+  </div>
+  <div class="meta-box">
+    <div class="meta-label">Payment</div>
+    <div class="meta-val">{{ order.get_payment_status_display }}</div>
+  </div>
+  <div class="meta-box">
+    <div class="meta-label">Total</div>
+    <div class="meta-val">{% if order.final_amount %}${{ order.final_amount }}{% else %}Pending quote{% endif %}</div>
+  </div>
+</div>
+
+<!-- DELIVERY CONFIRMATION -->
+{% if delivery and delivery.is_delivered %}
+<div class="delivery-banner">
+  <span class="icon"><i class="bi bi-check-circle"></i></span>
+  <div>
+    <h3>Order Delivered!</h3>
+    <p>Delivered on {{ delivery.delivery_date|date:"F j, Y" }} via {{ delivery.delivery_method }}{% if delivery.received_by %}, received by {{ delivery.received_by }}{% endif %}</p>
+  </div>
+</div>
+{% elif order.status == 'ready_for_delivery' or order.status == 'completed' %}
+<div class="delivery-banner" style="background:#fffbf0;border-color:#ffe0a0;">
+  <span class="icon">🎉</span>
+  <div>
+    <h3 style="color:#856404;">Ready for Collection!</h3>
+    <p>Your order is complete and ready. We'll be in touch to arrange pickup or delivery.</p>
+  </div>
+</div>
+{% endif %}
+
+<!-- GARMENTS -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Garments ({{ items.count }})</span>
+  </div>
+  {% for item in items %}
+  <div class="garment-card">
+    <div class="garment-header">
+      <span class="garment-name">{{ item.garment_type }}</span>
+      <span class="badge badge-{{ item.item_status }}">{{ item.get_item_status_display }}</span>
+    </div>
+    <div class="garment-body">
+      {% if item.fabric %}<div class="detail-item"><label>Fabric</label><span>{{ item.fabric }}</span></div>{% endif %}
+      {% if item.color %}<div class="detail-item"><label>Color</label><span>{{ item.color }}</span></div>{% endif %}
+      {% if item.size_label %}<div class="detail-item"><label>Size</label><span>{{ item.size_label }}</span></div>{% endif %}
+      <div class="detail-item"><label>Quantity</label><span>{{ item.quantity }}</span></div>
+      {% if item.special_instructions %}
+      <div class="notes-box">📝 {{ item.special_instructions }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Production Timeline -->
+    {% if item.tickets.all %}
+    <div style="padding:1.25rem;border-top:1px solid var(--border);">
+      <div style="font-size:0.8rem;font-weight:600;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;">Production Progress</div>
+      {% for ticket in item.tickets.all %}
+      <div style="margin-bottom:1.25rem;">
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.75rem;">Ticket {{ ticket.ticket_code }}, <span class="badge badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span></div>
+        <div class="timeline">
+          {% for history in ticket.status_history.all %}
+          <div class="tl-item">
+            <div class="tl-dot done"></div>
+            <div class="tl-stage">{{ history.stage.stage_name }}</div>
+            <div class="tl-time">{{ history.changed_at|date:"M d, Y, g:i A" }}</div>
+          </div>
+          {% endfor %}
+          {% if ticket.current_stage %}
+          <div class="tl-item">
+            <div class="tl-dot current"></div>
+            <div class="tl-stage">{{ ticket.current_stage.stage_name }} <span style="color:var(--gold);font-size:0.75rem;">(current stage)</span></div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div style="padding:1rem 1.25rem;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;">
+      ⏳ Production ticket not yet assigned. Our team will review your booking shortly.
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

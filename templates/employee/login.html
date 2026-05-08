@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Login | StitchPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg:#0f1117;--surface:#1a1d27;--border:#2e3347;--accent:#4f8ef7;--text:#e8eaf0;--muted:#6b7280;--red:#ef4444; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+    .box { width:100%; max-width:400px; padding:2rem; }
+    .brand { text-align:center; margin-bottom:2rem; }
+    .brand-dot { width:12px;height:12px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:6px;vertical-align:middle; }
+    .brand h1 { font-size:1.5rem; font-weight:700; display:inline; }
+    .brand p { color:var(--muted); font-size:0.85rem; margin-top:0.4rem; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:2rem; }
+    .card h2 { font-size:1.1rem; font-weight:600; margin-bottom:0.25rem; }
+    .card p { color:var(--muted); font-size:0.85rem; margin-bottom:1.5rem; }
+    .form-group { margin-bottom:1rem; }
+    label { display:block; font-size:0.73rem; font-weight:600; letter-spacing:0.08em; color:var(--muted); margin-bottom:0.35rem; }
+    input { width:100%; padding:0.65rem 0.9rem; background:#22263a; border:1px solid var(--border); border-radius:7px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.15s; }
+    input:focus { border-color:var(--accent); }
+    .btn { width:100%; padding:0.7rem; background:var(--accent); color:#fff; border:none; border-radius:7px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; cursor:pointer; margin-top:0.5rem; transition:background 0.15s; }
+    .btn:hover { background:#3a7ce8; }
+    .error { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; padding:0.7rem 1rem; border-radius:7px; font-size:0.85rem; margin-bottom:1rem; }
+    .links { text-align:center; margin-top:1.25rem; font-size:0.82rem; color:var(--muted); }
+    .links a { color:var(--accent); text-decoration:none; }
+  </style>
+</head>
+<body>
+<div class="box">
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <h1>StitchPro</h1>
+    <p>Staff Portal, Employee Access</p>
+  </div>
+  <div class="card">
+    <h2>Sign in to Staff Portal</h2>
+    <p>Enter your work email and password</p>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Work Email</label>
+        <input type="email" name="email" value="{{ email|default:'' }}" placeholder="you@stitchpro.com" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Your password" required>
+      </div>
+      <button type="submit" class="btn">Sign in</button>
+    </form>
+  </div>
+  <div class="links">
+    <a href="{% url 'portal_home' %}">Back to the customer site</a>
+    &nbsp;·&nbsp;
+    <a href="{% url 'login' %}">Admin login</a>
+  </div>
+</div>
+</body>
+</html>

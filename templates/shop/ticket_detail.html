@@ -1,0 +1,268 @@
+{% extends "shop/base.html" %}
+{% block title %}{{ ticket.ticket_code }}{% endblock %}
+{% block page_title %}{{ ticket.ticket_code }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Left: Ticket info -->
+  <div class="col-lg-4">
+    <div class="card mb-3">
+      <div class="card-header"><span style="font-weight:600">Ticket Info</span></div>
+      <div class="card-body">
+        <div class="mb-2">
+          <span class="badge-status badge-{{ ticket.status }}">{{ ticket.get_status_display }}</span>
+          <span class="badge-status badge-{{ ticket.priority }} ms-1">{{ ticket.get_priority_display }}</span>
+          {% if ticket.is_overdue %}<span class="badge ms-1" style="background:#fee2e2;color:#dc2626"><i class="bi bi-exclamation-triangle"></i> Overdue</span>{% endif %}
+        </div>
+        <div class="mb-2"><strong>Garment:</strong> {{ ticket.order_item.garment_type }}</div>
+        <div class="mb-2"><strong>Order:</strong>
+          <a href="{% url 'order_detail' ticket.order_item.order.pk %}" style="color:#7c3aed">
+            #{{ ticket.order_item.order.pk }}
+          </a>
+        </div>
+        <div class="mb-2"><strong>Customer:</strong> {{ ticket.order_item.order.customer.full_name }}</div>
+        <div class="mb-2"><strong>Current Stage:</strong> {{ ticket.current_stage.stage_name|default:"Not set" }}</div>
+        <div class="mb-2"><strong>Created:</strong> {{ ticket.created_date|date:"M j, Y" }}</div>
+        {% if ticket.deadline %}
+        <div class="mb-2">
+          <strong>Deadline:</strong>
+          <span {% if ticket.is_overdue %}style="color:#dc2626;font-weight:600"{% endif %}>{{ ticket.deadline|date:"M j, Y" }}</span>
+        </div>
+        {% endif %}
+        {% if ticket.design_notes %}<div class="mt-2 p-2" style="background:#f8f7ff;border-radius:8px;font-size:13px"><strong>Design Notes:</strong> {{ ticket.design_notes }}</div>{% endif %}
+        {% if ticket.observations %}<div class="mt-2 p-2" style="background:#fff7ed;border-radius:8px;font-size:13px"><strong>Observations:</strong> {{ ticket.observations }}</div>{% endif %}
+      </div>
+    </div>
+
+    <!-- Update Stage -->
+    <div class="card mb-3">
+      <div class="card-header"><span style="font-weight:600">Update Production Stage</span></div>
+      <div class="card-body">
+        <form method="post" action="{% url 'ticket_update_stage' ticket.pk %}">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label class="form-label">Stage</label>
+            {{ update_form.stage }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Ticket Status</label>
+            {{ update_form.status }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Updated By</label>
+            {{ update_form.changed_by }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Comment</label>
+            {{ update_form.comment }}
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Update Stage</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Assign Employee -->
+    <div class="card mb-3">
+      <div class="card-header"><span style="font-weight:600">Assign Employee</span></div>
+      <div class="card-body">
+        <form method="post" action="{% url 'ticket_assign' ticket.pk %}">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label class="form-label">Employee</label>
+            {{ assign_form.employee }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Notes</label>
+            {{ assign_form.notes }}
+          </div>
+          <button type="submit" class="btn btn-outline-primary w-100">Assign</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Report Damage -->
+    <div class="card">
+      <div class="card-header" style="color:#dc2626"><span style="font-weight:600"><i class="bi bi-exclamation-triangle"></i> Report damage</span></div>
+      <div class="card-body">
+        <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#damageModal">
+          Report Incident
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Timeline + Assignments -->
+  <div class="col-lg-8">
+    <!-- Current Assignment -->
+    {% for a in assignments %}{% if a.assignment_status == 'current' %}
+    <div class="mb-3 p-3" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;background:#059669;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px">
+        {{ a.employee.first_name|first }}
+      </div>
+      <div>
+        <div style="font-weight:600">Currently Assigned: {{ a.employee.full_name }}</div>
+        <div style="font-size:12px;color:#059669">{{ a.employee.get_role_display }} · Assigned {{ a.assigned_at|date:"M j, Y" }}</div>
+      </div>
+    </div>
+    {% endif %}{% endfor %}
+
+    <!-- Damage Incidents -->
+    {% if incidents %}
+    <div class="card mb-4">
+      <div class="card-header" style="color:#dc2626"><span style="font-weight:600">Damage Incidents</span></div>
+      <div class="card-body p-0">
+        {% for incident in incidents %}
+        <div style="border-bottom:1px solid #fee2e2;padding:12px 16px">
+          <div class="d-flex justify-content-between">
+            <div>
+              <strong>{{ incident.get_incident_type_display }}</strong>
+              <span style="font-size:12px;color:#dc2626;margin-left:8px">{{ incident.get_severity_display }}</span>
+            </div>
+            <span class="badge-status {% if incident.is_resolved %}badge-completed{% else %}badge-blocked{% endif %}">
+              {% if incident.is_resolved %}Resolved{% else %}Unresolved{% endif %}
+            </span>
+          </div>
+          <div style="font-size:13px;color:#6b7280;margin-top:4px">{{ incident.description }}</div>
+          <div style="font-size:12px;margin-top:4px">Resolution: {{ incident.get_resolution_action_display }}</div>
+          {% if not incident.is_resolved %}
+          <form method="post" action="{% url 'damage_incident_resolve' incident.pk %}" class="mt-2 d-flex gap-2">
+            {% csrf_token %}
+            <select name="resolution_action" class="form-select form-select-sm" style="width:150px">
+              <option value="repair">Repair</option>
+              <option value="remake">Remake</option>
+              <option value="discount">Discount</option>
+              <option value="cancel_item">Cancel Item</option>
+            </select>
+            <input type="text" name="resolution_notes" class="form-control form-control-sm" placeholder="Resolution notes">
+            <button type="submit" class="btn btn-sm btn-success">Resolve</button>
+          </form>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Status History Timeline -->
+    <div class="card">
+      <div class="card-header"><span style="font-weight:600">Production History</span></div>
+      <div class="card-body">
+        {% if history %}
+        <div class="timeline">
+          {% for h in history %}
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div style="font-weight:600;font-size:13px">{{ h.stage.stage_name }}</div>
+            <div style="font-size:11px;color:#6b7280">
+              {{ h.changed_at|date:"M j, Y H:i" }}
+              {% if h.changed_by %} · by {{ h.changed_by.full_name }}{% endif %}
+            </div>
+            {% if h.comment %}<div style="font-size:12px;margin-top:4px;color:#374151">{{ h.comment }}</div>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+          <div class="text-center text-muted py-3">No history yet.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Assignment History -->
+    {% if assignments %}
+    <div class="card mt-4">
+      <div class="card-header"><span style="font-weight:600">Assignment History</span></div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead><tr><th style="padding-left:16px">Employee</th><th>Role</th><th>Assigned</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for a in assignments %}
+            <tr>
+              <td style="padding-left:16px;font-weight:500">{{ a.employee.full_name }}</td>
+              <td style="font-size:12px;color:#6b7280">{{ a.employee.get_role_display }}</td>
+              <td style="font-size:12px">{{ a.assigned_at|date:"M j, Y" }}</td>
+              <td><span class="badge-status badge-{{ a.assignment_status }}">{{ a.get_assignment_status_display }}</span></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Damage Modal -->
+<div class="modal fade" id="damageModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="border-color:#fee2e2">
+        <h5 class="modal-title" style="color:#dc2626">Report Damage Incident</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" action="{% url 'damage_incident_create' ticket.pk %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Incident Type *</label>
+              <select name="incident_type" class="form-select" required>
+                <option value="ripped">Ripped</option>
+                <option value="stained">Stained</option>
+                <option value="wrong_cut">Wrong Cut</option>
+                <option value="wrong_measurement">Wrong Measurement</option>
+                <option value="lost_item">Lost Item</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Severity</label>
+              <select name="severity" class="form-select">
+                <option value="minor">Minor</option>
+                <option value="moderate">Moderate</option>
+                <option value="severe">Severe</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Description *</label>
+              <textarea name="description" class="form-control" rows="3" required></textarea>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Resolution Action</label>
+              <select name="resolution_action" class="form-select">
+                <option value="pending">Pending</option>
+                <option value="repair">Repair</option>
+                <option value="remake">Remake</option>
+                <option value="discount">Discount</option>
+                <option value="cancel_item">Cancel Item</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Reported By</label>
+              <select name="reported_by" class="form-select">
+                <option value="">,</option>
+                {% for assignment in ticket.assignments.all %}
+                  <option value="{{ assignment.employee.pk }}" {% if assignment.assignment_status == 'current' %}selected{% endif %}>
+                    {{ assignment.employee.full_name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Internal Cost ($)</label>
+              <input type="number" name="internal_cost" class="form-control" step="0.01" value="0.00">
+            </div>
+            <div class="col-6">
+              <label class="form-label">Discount Applied ($)</label>
+              <input type="number" name="discount_applied" class="form-control" step="0.01" value="0.00">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Report Incident</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

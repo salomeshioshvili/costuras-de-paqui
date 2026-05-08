@@ -1,0 +1,27 @@
+{% extends "shop/base.html" %}
+{% block title %}Employees{% endblock %}
+{% block page_title %}Employees{% endblock %}
+
+{% block content %}
+{% include "includes/workshop_page_intro.html" with title="Team directory" eyebrow="Workshop" %}
+<p class="workshop-page-intro__subtitle" style="margin-top:-0.5rem;margin-bottom:1.35rem">{{ employees.count }} active · specialties and current task load.</p>
+<div class="row g-3">
+{% for emp in employees %}
+<div class="col-md-4 col-lg-3">
+  <div class="card text-center p-3 border-0 workshop-team-card">
+    <div class="workshop-team-avatar">
+      {{ emp.first_name|first }}{{ emp.last_name|first }}
+    </div>
+    <div style="font-weight:600;margin-top:8px">{{ emp.full_name }}</div>
+    <div style="font-size:12px;color:#845ec2;margin-bottom:4px">{{ emp.get_role_display }}</div>
+    {% if emp.specialty %}<div style="font-size:11px;color:#6b7280">{{ emp.specialty }}</div>{% endif %}
+    <div class="mt-2">
+      <span class="badge" style="background:#f0fdf4;color:#059669">{{ emp.active_tasks }} active task{{ emp.active_tasks|pluralize }}</span>
+    </div>
+  </div>
+</div>
+{% empty %}
+<div class="col-12 text-center py-5 text-muted">No active employees.</div>
+{% endfor %}
+</div>
+{% endblock %}
