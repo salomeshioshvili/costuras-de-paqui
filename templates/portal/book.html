@@ -1,5 +1,6 @@
 {% extends 'portal/base.html' %}
-{% block title %}Book a Garment{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Book a Garment" %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -37,12 +38,12 @@
 
 {% block content %}
 <div class="page-header">
-  <h1>Book a New Garment</h1>
-  <p>Fill in the details below and your order price will be calculated automatically.</p>
+  <h1>{% trans "Book a New Garment" %}</h1>
+  <p>{% trans "Fill in the details below and your order price will be calculated automatically." %}</p>
 </div>
 
 <div class="info-box">
-  <i class="bi bi-info-circle me-2" aria-hidden="true"></i>Your booking is reviewed by our team and priced automatically from garment details.
+  <i class="bi bi-info-circle me-2" aria-hidden="true"></i>{% trans "Your booking is reviewed by our team and priced automatically from garment details." %}
 </div>
 
 {% if error %}
@@ -50,11 +51,10 @@
 {% endif %}
 
 <div class="card">
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    <!-- GARMENT TYPE -->
-    <div class="section-label">Garment Type *</div>
+    <div class="section-label">{% trans "Garment type" %} *</div>
     <div class="radio-grid">
       {% for g in garment_types %}
       <div class="radio-option">
@@ -64,56 +64,65 @@
       {% endfor %}
     </div>
 
-    <!-- DETAILS -->
-    <div class="section-label" style="margin-top:1.5rem;">Fabric & Style</div>
+    <div class="section-label" style="margin-top:1.5rem;">{% trans "Fabric and style" %}</div>
     <div class="form-grid">
       <div class="form-group">
-        <label>Fabric / Material</label>
-        <input type="text" name="fabric" value="{{ data.fabric|default:'' }}" placeholder="e.g. Silk, Cotton, Linen">
+        <label>{% trans "Fabric / material" %}</label>
+        <input type="text" name="fabric" value="{{ data.fabric|default:'' }}" placeholder="{% trans 'e.g. Silk, Cotton, Linen' %}">
       </div>
       <div class="form-group">
-        <label>Color</label>
-        <input type="text" name="color" value="{{ data.color|default:'' }}" placeholder="e.g. Navy Blue, Ivory">
+        <label>{% trans "Color" %}</label>
+        <input type="text" name="color" value="{{ data.color|default:'' }}" placeholder="{% trans 'e.g. Navy Blue, Ivory' %}">
       </div>
     </div>
     <div class="form-group">
-      <label>Special Instructions / Design Notes</label>
-      <textarea name="special_instructions" placeholder="Describe any design details, patterns, embellishments, or special requirements...">{{ data.special_instructions|default:'' }}</textarea>
+      <label>{% trans "Special instructions / design notes" %}</label>
+      <textarea name="special_instructions" placeholder="{% trans 'Describe any design details, patterns, embellishments, or special requirements…' %}">{{ data.special_instructions|default:'' }}</textarea>
     </div>
 
-    <!-- SCHEDULING -->
-    <div class="section-label" style="margin-top:0.5rem;">Scheduling</div>
+    <div class="section-label" style="margin-top:0.5rem;">{% trans "Scheduling" %}</div>
     <div class="form-grid">
       <div class="form-group">
-        <label>Requested Due Date *</label>
+        <label>{% trans "Requested due date" %} *</label>
         <input type="date" name="due_date" value="{{ data.due_date|default:'' }}" required>
-        <p class="form-note">We'll confirm if this date is achievable.</p>
+        <p class="form-note">{% trans "We will confirm if this date is achievable." %}</p>
       </div>
       <div class="form-group">
-        <label>Quantity</label>
+        <label>{% trans "Quantity" %}</label>
         <input type="number" name="quantity" value="{{ data.quantity|default:'1' }}" min="1" max="50">
       </div>
     </div>
 
-    <!-- PRIORITY -->
-    <div class="section-label" style="margin-top:0.5rem;">Priority</div>
+    <div class="section-label" style="margin-top:0.5rem;">{% trans "Priority" %}</div>
     <div class="radio-grid" style="grid-template-columns:repeat(3,1fr);max-width:400px;">
       <div class="radio-option">
         <input type="radio" name="priority" id="p_normal" value="normal" {% if data.priority != 'high' and data.priority != 'urgent' %}checked{% endif %}>
-        <label for="p_normal">Normal</label>
+        <label for="p_normal">{% trans "Normal" %}</label>
       </div>
       <div class="radio-option">
         <input type="radio" name="priority" id="p_high" value="high" {% if data.priority == 'high' %}checked{% endif %}>
-        <label for="p_high">High</label>
+        <label for="p_high">{% trans "High" %}</label>
       </div>
       <div class="radio-option">
         <input type="radio" name="priority" id="p_urgent" value="urgent" {% if data.priority == 'urgent' %}checked{% endif %}>
-        <label for="p_urgent">Urgent</label>
+        <label for="p_urgent">{% trans "Urgent" %}</label>
       </div>
     </div>
 
+    <div class="section-label" style="margin-top:0.5rem;">{% trans "Reference image (optional)" %}</div>
+    <div class="form-group">
+      <input type="file" name="reference_image" accept="image/*">
+      <p class="form-note">{% trans "A photo, sketch or screenshot of the look you want." %}</p>
+    </div>
+
+    <div class="section-label" style="margin-top:0.5rem;">{% trans "Discount or referral code" %}</div>
+    <div class="form-group">
+      <input type="text" name="applied_code" value="{{ data.applied_code|default:'' }}" placeholder="{% trans 'e.g. CDP-AB12CD or NEW10' %}">
+      <p class="form-note">{% trans "Enter a code shared by another customer or staff to apply a discount." %}</p>
+    </div>
+
     <div style="margin-top:1.5rem;">
-      <button type="submit" class="btn btn-primary btn-full"><i class="bi bi-send me-1" aria-hidden="true"></i>Submit booking</button>
+      <button type="submit" class="btn btn-primary btn-full"><i class="bi bi-send me-1" aria-hidden="true"></i>{% trans "Submit booking" %}</button>
     </div>
   </form>
 </div>

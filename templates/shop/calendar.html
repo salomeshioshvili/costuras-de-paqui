@@ -1,0 +1,53 @@
+{% extends 'shop/base.html' %}
+{% block title %}Calendar{% endblock %}
+{% block page_title %}Calendar{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="m-0">{{ year }}-{{ month|stringformat:"02d" }}</h2>
+  <div>
+    <a href="?year={{ year }}&month={{ month|add:'-1' }}" class="btn btn-outline-secondary btn-sm">«</a>
+    <a href="{% url 'calendar' %}" class="btn btn-outline-primary btn-sm">Today</a>
+    <a href="?year={{ year }}&month={{ month|add:'1' }}" class="btn btn-outline-secondary btn-sm">»</a>
+  </div>
+</div>
+
+<div class="card">
+  <table class="table mb-0">
+    <thead>
+      <tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr>
+    </thead>
+    <tbody>
+      {% for week in weeks %}
+        <tr>
+          {% for day in week %}
+            <td style="vertical-align:top;height:110px;width:14%;">
+              {% if day %}
+                <div class="fw-semibold {% if day == today.day and month == today.month and year == today.year %}text-primary{% endif %}">{{ day }}</div>
+                {% for d, items in by_day.items %}
+                  {% if d == day %}
+                    {% for entry in items|slice:":3" %}
+                      <div class="small">
+                        {% if entry.0 == 'order' %}
+                          <a href="{% url 'order_detail' entry.1.pk %}">#{{ entry.1.pk }} {{ entry.1.customer.last_name }}</a>
+                        {% elif entry.0 == 'ticket' %}
+                          <a href="{% url 'ticket_detail' entry.1.pk %}">{{ entry.1.ticket_code }}</a>
+                        {% else %}
+                          <span class="text-info">{{ entry.1.get_kind_display }} · {{ entry.1.customer.last_name }}</span>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                    {% if items|length > 3 %}
+                      <div class="small text-muted">+ {{ items|length|add:'-3' }} more</div>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

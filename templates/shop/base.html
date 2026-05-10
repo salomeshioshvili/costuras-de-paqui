@@ -1,6 +1,6 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -35,11 +35,13 @@
 
     .sidebar {
       width: 244px;
-      min-height: calc(100vh - 28px);
+      height: calc(100vh - 28px);
+      max-height: calc(100vh - 28px);
       margin: 14px 0 14px 12px;
       background: var(--sidebar-bg);
       position: fixed; left: 0; top: 0; z-index: 100;
       display: flex; flex-direction: column;
+      overflow: hidden;
       border-radius: 0 26px 26px 0;
       border: 1px solid rgba(255,255,255,0.06);
       box-shadow: 0 12px 40px rgba(0,0,0,0.18);
@@ -56,7 +58,13 @@
     .sidebar-brand .brand-name { color: #fff; font-weight: 800; font-size: 14px; line-height: 1.2; letter-spacing: -0.02em; }
     .sidebar-brand .brand-sub { color: var(--sidebar-text); font-size: 11px; font-weight: 500; }
 
-    .sidebar-nav { flex: 1; padding: 14px 10px; overflow-y: auto; }
+    .sidebar-nav {
+      flex: 1;
+      min-height: 0;
+      padding: 14px 10px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     .sidebar-section { padding: 0 6px; margin-bottom: 6px; }
     .sidebar-label {
       font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.38); text-transform: uppercase;
@@ -242,46 +250,78 @@
 
   <div class="sidebar-nav">
     <div class="sidebar-section">
-      <div class="sidebar-label">Main</div>
+      <div class="sidebar-label">{% trans "Main" %}</div>
       <a href="{% url 'dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+        <i class="bi bi-grid-1x2-fill"></i> {% trans "Dashboard" %}
       </a>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Operations</div>
+      <div class="sidebar-label">{% trans "Operations" %}</div>
       <a href="{% url 'customer_list' %}" class="sidebar-link {% if 'customer' in request.resolver_match.url_name %}active{% endif %}">
-        <i class="bi bi-people-fill"></i> Customers
+        <i class="bi bi-people-fill"></i> {% trans "Customers" %}
       </a>
-      <a href="{% url 'order_list' %}" class="sidebar-link {% with u=request.resolver_match.url_name %}{% if u == 'order_list' or u == 'order_detail' or u == 'order_create' or u == 'order_edit' or u == 'order_status_update' or u == 'payment_add' or u == 'delivery_create' or u == 'delivery_confirm' %}active{% endif %}{% endwith %}">
-        <i class="bi bi-bag-heart-fill"></i> Orders
+      <a href="{% url 'order_list' %}" class="sidebar-link {% with u=request.resolver_match.url_name %}{% if u == 'order_list' or u == 'order_detail' or u == 'order_create' or u == 'order_edit' or u == 'order_status_update' or u == 'payment_add' or u == 'delivery_create' or u == 'delivery_confirm' or u == 'order_invoice' %}active{% endif %}{% endwith %}">
+        <i class="bi bi-bag-heart-fill"></i> {% trans "Orders" %}
       </a>
       <a href="{% url 'ticket_list' %}" class="sidebar-link {% if 'ticket' in request.resolver_match.url_name %}active{% endif %}">
-        <i class="bi bi-receipt-cutoff"></i> Work tickets
+        <i class="bi bi-receipt-cutoff"></i> {% trans "Work tickets" %}
+      </a>
+      <a href="{% url 'calendar' %}" class="sidebar-link {% if request.resolver_match.url_name == 'calendar' %}active{% endif %}">
+        <i class="bi bi-calendar3"></i> {% trans "Calendar" %}
       </a>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Team</div>
+      <div class="sidebar-label">{% trans "Inventory" %}</div>
+      <a href="{% url 'inventory' %}" class="sidebar-link {% if request.resolver_match.url_name == 'inventory' %}active{% endif %}">
+        <i class="bi bi-boxes"></i> {% trans "Stock and suppliers" %}
+      </a>
+      <a href="{% url 'material_list' %}" class="sidebar-link {% if 'material' in request.resolver_match.url_name and 'request' not in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-archive"></i> {% trans "Materials" %}
+      </a>
+      <a href="{% url 'material_request_list' %}" class="sidebar-link {% if 'material_request' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-clipboard-data"></i> {% trans "Material requests" %}
+        {% if topbar_pending_requests %}<span class="badge bg-warning text-dark ms-auto">{{ topbar_pending_requests }}</span>{% endif %}
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">{% trans "Customer experience" %}</div>
+      <a href="{% url 'lead_list' %}" class="sidebar-link {% if 'lead' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-inbox-fill"></i> {% trans "Intake leads" %}
+        {% if topbar_pending_leads %}<span class="badge bg-info text-dark ms-auto">{{ topbar_pending_leads }}</span>{% endif %}
+      </a>
+      <a href="{% url 'pricing_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'pricing_dashboard' %}active{% endif %}">
+        <i class="bi bi-tags-fill"></i> {% trans "Pricing and FX" %}
+      </a>
+      <a href="{% url 'notifications' %}" class="sidebar-link {% if request.resolver_match.url_name == 'notifications' %}active{% endif %}">
+        <i class="bi bi-bell-fill"></i> {% trans "Notifications" %}
+        {% if topbar_notif_unread %}<span class="badge bg-danger ms-auto">{{ topbar_notif_unread }}</span>{% endif %}
+      </a>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">{% trans "Team" %}</div>
       <a href="{% url 'employee_list' %}" class="sidebar-link {% if 'employee' in request.resolver_match.url_name %}active{% endif %}">
-        <i class="bi bi-person-badge-fill"></i> Employees
+        <i class="bi bi-person-badge-fill"></i> {% trans "Employees" %}
       </a>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">Insights</div>
+      <div class="sidebar-label">{% trans "Insights" %}</div>
       <a href="{% url 'reports' %}" class="sidebar-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
-        <i class="bi bi-pie-chart-fill"></i> Reports
+        <i class="bi bi-pie-chart-fill"></i> {% trans "Reports" %}
       </a>
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-label">System</div>
+      <div class="sidebar-label">{% trans "System" %}</div>
       <a href="/admin/" class="sidebar-link">
-        <i class="bi bi-sliders"></i> Django admin
+        <i class="bi bi-sliders"></i> {% trans "Admin" %}
       </a>
       <a href="{% url 'logout' %}" class="sidebar-link">
-        <i class="bi bi-box-arrow-right"></i> Sign out
+        <i class="bi bi-box-arrow-right"></i> {% trans "Sign out" %}
       </a>
     </div>
   </div>
@@ -290,22 +330,57 @@
 <div class="main-content">
   <header class="topbar">
     <div class="topbar-row">
-      <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+      <div class="topbar-title">{% block page_title %}{% trans "Dashboard" %}{% endblock %}</div>
       <div class="topbar-search-wrap">
-        <div class="topbar-search" role="search" aria-label="Search">
+        <form method="get" action="{% url 'search' %}" class="topbar-search" role="search" aria-label="{% trans 'Search' %}" style="border:none;background:var(--primary-light);">
           <i class="bi bi-search" aria-hidden="true"></i>
-          <span>Search orders, customers, or notes… (browse via menu for now)</span>
-        </div>
+          <input type="text" name="q" value="{{ request.GET.q|default:'' }}"
+                 placeholder="{% trans 'Search orders, customers, tickets, materials, leads…' %}"
+                 style="border:none;background:transparent;outline:none;flex:1;font-size:13px;color:var(--text-main);">
+        </form>
         <div class="topbar-pills">
-          <span class="pill-label">In:</span>
-          <a href="{% url 'order_list' %}" class="top-pill">Orders</a>
-          <a href="{% url 'customer_list' %}" class="top-pill">Customers</a>
-          <a href="{% url 'ticket_list' %}" class="top-pill">Tickets</a>
+          <span class="pill-label">{% trans "In:" %}</span>
+          <a href="{% url 'order_list' %}" class="top-pill">{% trans "Orders" %}</a>
+          <a href="{% url 'customer_list' %}" class="top-pill">{% trans "Customers" %}</a>
+          <a href="{% url 'ticket_list' %}" class="top-pill">{% trans "Tickets" %}</a>
+          <a href="{% url 'material_list' %}" class="top-pill">{% trans "Materials" %}</a>
+          <a href="{% url 'lead_list' %}" class="top-pill">{% trans "Leads" %}</a>
         </div>
       </div>
-      <div class="topbar-actions">
-        <button type="button" class="topbar-icon-btn" aria-label="Notifications"><i class="bi bi-bell" aria-hidden="true"></i></button>
-        <button type="button" class="topbar-icon-btn" aria-label="Settings"><i class="bi bi-gear" aria-hidden="true"></i></button>
+      <div class="topbar-actions" style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+        <form action="{% url 'set_language' %}" method="post" style="display:inline;margin:0;">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <label class="visually-hidden" for="id_language_shop">{% trans "Language" %}</label>
+          <select name="language" id="id_language_shop" class="form-select form-select-sm"
+                  style="width:auto;min-width:7rem;border-radius:12px;border-color:#dccdf9;"
+                  onchange="this.form.submit()">
+            {% get_current_language as LANG_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% for lang_code, lang_name in LANGUAGES %}
+              <option value="{{ lang_code }}" {% if lang_code == LANG_CODE %}selected{% endif %}>{{ lang_name }}</option>
+            {% endfor %}
+          </select>
+        </form>
+        <form action="{% url 'set_display_currency' %}" method="post" style="display:inline;margin:0;">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <label class="visually-hidden" for="id_currency_shop">{% trans "Display currency" %}</label>
+          <select name="currency" id="id_currency_shop" class="form-select form-select-sm"
+                  style="width:auto;min-width:4.5rem;border-radius:12px;border-color:#dccdf9;"
+                  onchange="this.form.submit()">
+            {% for code in display_currency_options %}
+              <option value="{{ code }}" {% if code == display_currency_code %}selected{% endif %}>{{ code }}</option>
+            {% endfor %}
+          </select>
+        </form>
+        <a href="{% url 'notifications' %}" class="topbar-icon-btn position-relative" aria-label="{% trans 'Notifications' %}" style="text-decoration:none;">
+          <i class="bi bi-bell" aria-hidden="true"></i>
+          {% if topbar_notif_unread %}
+            <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger" style="font-size:9px;">{{ topbar_notif_unread }}</span>
+          {% endif %}
+        </a>
+        <a href="/admin/" class="topbar-icon-btn" aria-label="{% trans 'Admin' %}" style="text-decoration:none;"><i class="bi bi-gear" aria-hidden="true"></i></a>
       </div>
     </div>
     <div class="topbar-row" style="justify-content:flex-end;">

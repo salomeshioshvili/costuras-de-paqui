@@ -1,17 +1,21 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.utils import timezone
 from decimal import Decimal
 from django.db.models import Sum, Count, Q, Value, DecimalField
 from django.db.models.functions import Coalesce
-from unfold.admin import ModelAdmin, TabularInline, StackedInline
-from unfold.decorators import display, action
+from unfold.admin import ModelAdmin, TabularInline
+from unfold.decorators import display
 
 from .models import (
-    Customer, Employee, EmployeeAvailability,
-    ProductionStage, CustomerOrder, OrderItem,
-    Measurement, WorkTicket, TaskAssignment,
-    TicketStatusHistory, DamageIncident, Payment, Delivery
+    AddOn, Appointment, Attachment, AuditLog,
+    Currency, Customer, CustomerOrder, CustomerReferral,
+    DamageIncident, Delivery, DiscountRule, Employee, EmployeeAvailability,
+    ExchangeRate, FabricType, GarmentCategory, Invoice, Lead,
+    Material, MaterialRequest, Measurement, NotificationLog,
+    NotificationPreference, OrderEvent, OrderItem, OrderItemMaterial,
+    OrderTemplate, Payment, ProductionStage, Receipt, ReferralCode,
+    StorageLocation, Supplier, SupplierOrder, SupplierOrderLine,
+    TaskAssignment, TicketStatusHistory, UrgencySurcharge, WorkTicket,
 )
 
 
@@ -429,3 +433,204 @@ class DeliveryAdmin(ModelAdmin):
     list_filter = ('delivery_method', 'is_delivered', 'delivery_date')
     search_fields = ('order__customer__first_name', 'order__customer__last_name', 'received_by')
     date_hierarchy = 'delivery_date'
+
+
+# ── Pricing & FX ─────────────────────────────────────────────────────
+
+
+@admin.register(GarmentCategory)
+class GarmentCategoryAdmin(ModelAdmin):
+    list_display = ('name', 'base_price', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('name',)
+
+
+@admin.register(FabricType)
+class FabricTypeAdmin(ModelAdmin):
+    list_display = ('name', 'multiplier', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('name',)
+
+
+@admin.register(AddOn)
+class AddOnAdmin(ModelAdmin):
+    list_display = ('name', 'price', 'kind', 'is_active')
+    list_filter = ('kind', 'is_active')
+    search_fields = ('name',)
+
+
+@admin.register(UrgencySurcharge)
+class UrgencySurchargeAdmin(ModelAdmin):
+    list_display = ('priority', 'multiplier', 'is_active')
+    list_filter = ('priority',)
+
+
+@admin.register(DiscountRule)
+class DiscountRuleAdmin(ModelAdmin):
+    list_display = ('code', 'kind', 'value', 'min_orders', 'is_active', 'valid_until')
+    list_filter = ('kind', 'is_active')
+    search_fields = ('code', 'label')
+
+
+@admin.register(ReferralCode)
+class ReferralCodeAdmin(ModelAdmin):
+    list_display = ('code', 'customer', 'percent', 'uses', 'max_uses', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('code', 'customer__first_name', 'customer__last_name')
+
+
+@admin.register(CustomerReferral)
+class CustomerReferralAdmin(ModelAdmin):
+    list_display = ('referrer', 'referee', 'order', 'code_used', 'reward_amount', 'created_at')
+    search_fields = ('code_used', 'referrer__first_name', 'referee__first_name')
+
+
+@admin.register(Currency)
+class CurrencyAdmin(ModelAdmin):
+    list_display = ('code', 'name', 'symbol', 'is_base')
+    list_filter = ('is_base',)
+
+
+@admin.register(ExchangeRate)
+class ExchangeRateAdmin(ModelAdmin):
+    list_display = ('currency', 'rate_to_base', 'captured_on', 'source')
+    list_filter = ('currency', 'source')
+    date_hierarchy = 'captured_on'
+
+
+# ── Inventory & suppliers ────────────────────────────────────────────
+
+
+@admin.register(StorageLocation)
+class StorageLocationAdmin(ModelAdmin):
+    list_display = ('code', 'kind', 'area', 'is_active')
+    list_filter = ('kind', 'is_active')
+    search_fields = ('code', 'area')
+
+
+@admin.register(Supplier)
+class SupplierAdmin(ModelAdmin):
+    list_display = ('name', 'contact_person', 'email', 'phone', 'lead_time_days', 'is_active')
+    list_filter = ('is_active',)
+    search_fields = ('name', 'contact_person', 'email')
+
+
+@admin.register(Material)
+class MaterialAdmin(ModelAdmin):
+    list_display = ('name', 'category', 'color', 'stock_on_hand',
+                    'low_stock_threshold', 'unit_cost', 'is_active')
+    list_filter = ('category', 'is_active', 'supplier')
+    search_fields = ('name', 'color', 'supplier__name')
+
+
+@admin.register(OrderItemMaterial)
+class OrderItemMaterialAdmin(ModelAdmin):
+    list_display = ('order_item', 'material', 'quantity', 'unit_cost_snapshot', 'consumed_at')
+    search_fields = ('material__name', 'order_item__garment_type')
+
+
+@admin.register(MaterialRequest)
+class MaterialRequestAdmin(ModelAdmin):
+    list_display = ('material', 'requested_by', 'quantity', 'priority', 'status', 'created_at')
+    list_filter = ('status', 'priority')
+    search_fields = ('material__name', 'requested_by__first_name', 'requested_by__last_name')
+
+
+class SupplierOrderLineInline(TabularInline):
+    model = SupplierOrderLine
+    extra = 1
+
+
+@admin.register(SupplierOrder)
+class SupplierOrderAdmin(ModelAdmin):
+    list_display = ('id', 'supplier', 'status', 'placed_on', 'received_on', 'total')
+    list_filter = ('status',)
+    search_fields = ('supplier__name',)
+    inlines = [SupplierOrderLineInline]
+
+
+# ── Notifications ────────────────────────────────────────────────────
+
+
+@admin.register(NotificationPreference)
+class NotificationPreferenceAdmin(ModelAdmin):
+    list_display = ('user', 'channel', 'enabled')
+    list_filter = ('channel', 'enabled')
+    search_fields = ('user__username', 'user__email')
+
+
+@admin.register(NotificationLog)
+class NotificationLogAdmin(ModelAdmin):
+    list_display = ('event', 'channel', 'recipient', 'status', 'created_at')
+    list_filter = ('event', 'channel', 'status')
+    search_fields = ('event', 'recipient', 'subject')
+    date_hierarchy = 'created_at'
+
+
+# ── Customer experience ──────────────────────────────────────────────
+
+
+@admin.register(Appointment)
+class AppointmentAdmin(ModelAdmin):
+    list_display = ('customer', 'kind', 'scheduled_at', 'status')
+    list_filter = ('kind', 'status')
+    search_fields = ('customer__first_name', 'customer__last_name')
+    date_hierarchy = 'scheduled_at'
+
+
+@admin.register(OrderTemplate)
+class OrderTemplateAdmin(ModelAdmin):
+    list_display = ('name', 'customer', 'created_at')
+    search_fields = ('name', 'customer__first_name', 'customer__last_name')
+
+
+@admin.register(Lead)
+class LeadAdmin(ModelAdmin):
+    list_display = ('name', 'garment_type', 'phone', 'email', 'status', 'created_at')
+    list_filter = ('status', 'language')
+    search_fields = ('name', 'email', 'phone', 'garment_type')
+
+
+@admin.register(Invoice)
+class InvoiceAdmin(ModelAdmin):
+    list_display = ('number', 'order', 'total', 'currency_code', 'issued_at')
+    search_fields = ('number', 'order__customer__last_name')
+    date_hierarchy = 'issued_at'
+
+
+@admin.register(Receipt)
+class ReceiptAdmin(ModelAdmin):
+    list_display = ('number', 'payment', 'amount', 'currency_code', 'issued_at')
+    search_fields = ('number',)
+    date_hierarchy = 'issued_at'
+
+
+# ── Audit & events ───────────────────────────────────────────────────
+
+
+@admin.register(AuditLog)
+class AuditLogAdmin(ModelAdmin):
+    list_display = ('action', 'target_type', 'target_id', 'actor', 'at')
+    list_filter = ('action', 'target_type')
+    search_fields = ('action', 'target_type', 'message')
+    date_hierarchy = 'at'
+    readonly_fields = ('action', 'target_type', 'target_id', 'actor', 'before', 'after',
+                        'message', 'at')
+
+
+@admin.register(OrderEvent)
+class OrderEventAdmin(ModelAdmin):
+    list_display = ('order', 'kind', 'actor', 'at')
+    list_filter = ('kind',)
+    date_hierarchy = 'at'
+
+
+# ── Attachments ──────────────────────────────────────────────────────
+
+
+@admin.register(Attachment)
+class AttachmentAdmin(ModelAdmin):
+    list_display = ('content_type', 'object_id', 'kind', 'uploaded_by', 'uploaded_at')
+    list_filter = ('kind',)
+    search_fields = ('caption',)
+    date_hierarchy = 'uploaded_at'

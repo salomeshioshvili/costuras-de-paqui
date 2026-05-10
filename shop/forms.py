@@ -1,9 +1,7 @@
 from django import forms
-from django.utils import timezone
 from .models import (
     Customer, CustomerOrder, OrderItem, Measurement,
-    WorkTicket, TaskAssignment, TicketStatusHistory,
-    DamageIncident, Payment, Delivery, Employee
+    WorkTicket, TaskAssignment, DamageIncident, Payment, Delivery, Employee
 )
 
 

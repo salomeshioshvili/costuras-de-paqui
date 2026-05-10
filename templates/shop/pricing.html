@@ -1,0 +1,123 @@
+{% extends 'shop/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Pricing and FX" %}{% endblock %}
+{% block page_title %}{% trans "Pricing and FX" %}{% endblock %}
+
+{% block content %}
+<div class="alert border-0 mb-4" role="alert" style="border-radius:18px;background:#f3ecff;border:1px solid rgba(132,94,194,0.25) !important;color:#3d3658;">
+  {% trans "Changes here affect new bookings only. Totals on existing orders stay as agreed." %}
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Garment categories</strong>
+        <a class="btn btn-sm btn-outline-primary" href="/admin/shop/garmentcategory/add/">+ New</a>
+      </div>
+      <table class="table mb-0">
+        <thead><tr><th>Name</th><th>Base €</th><th></th></tr></thead>
+        <tbody>
+          {% for c in categories %}
+          <tr>
+            <td>{{ c.name }}</td><td>€{{ c.base_price }}</td>
+            <td><a class="btn btn-sm btn-link" href="/admin/shop/garmentcategory/{{ c.pk }}/change/">Edit</a></td>
+          </tr>
+          {% empty %}<tr><td colspan="3" class="text-muted text-center">No categories yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Fabric types</strong>
+        <a class="btn btn-sm btn-outline-primary" href="/admin/shop/fabrictype/add/">+ New</a>
+      </div>
+      <table class="table mb-0">
+        <thead><tr><th>Name</th><th>Multiplier</th><th></th></tr></thead>
+        <tbody>
+          {% for f in fabrics %}
+          <tr>
+            <td>{{ f.name }}</td><td>×{{ f.multiplier }}</td>
+            <td><a class="btn btn-sm btn-link" href="/admin/shop/fabrictype/{{ f.pk }}/change/">Edit</a></td>
+          </tr>
+          {% empty %}<tr><td colspan="3" class="text-muted text-center">No fabric types yet.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Add-ons</strong>
+        <a class="btn btn-sm btn-outline-primary" href="/admin/shop/addon/add/">+ New</a>
+      </div>
+      <table class="table mb-0">
+        <thead><tr><th>Name</th><th>Price</th><th>Kind</th></tr></thead>
+        <tbody>
+          {% for a in addons %}
+          <tr><td>{{ a.name }}</td><td>€{{ a.price }}</td><td>{{ a.get_kind_display }}</td></tr>
+          {% empty %}<tr><td colspan="3" class="text-muted text-center">No add-ons.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Urgency surcharges</strong>
+        <a class="btn btn-sm btn-outline-primary" href="/admin/shop/urgencysurcharge/add/">+ New</a>
+      </div>
+      <table class="table mb-0">
+        <thead><tr><th>Priority</th><th>Multiplier</th></tr></thead>
+        <tbody>
+          {% for u in urgencies %}<tr><td>{{ u.get_priority_display }}</td><td>×{{ u.multiplier }}</td></tr>
+          {% empty %}<tr><td colspan="2" class="text-muted text-center">No surcharges set.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Discount rules</strong>
+        <a class="btn btn-sm btn-outline-primary" href="/admin/shop/discountrule/add/">+ New</a>
+      </div>
+      <table class="table mb-0">
+        <thead><tr><th>Code</th><th>Kind</th><th>Value</th><th>Active</th></tr></thead>
+        <tbody>
+          {% for d in discount_rules %}
+          <tr><td>{{ d.code }}</td><td>{{ d.get_kind_display }}</td><td>{{ d.value }}</td><td>{% if d.is_active %}<span class="badge bg-success">Yes</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td></tr>
+          {% empty %}<tr><td colspan="4" class="text-muted text-center">No discount rules.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header"><strong>Currencies & latest exchange rates</strong></div>
+      <table class="table mb-0">
+        <thead><tr><th>Code</th><th>Symbol</th><th>Latest rate</th><th>As of</th></tr></thead>
+        <tbody>
+          {% for c in currencies %}
+            {% with c.rates.first as latest %}
+              <tr>
+                <td>{{ c.code }}{% if c.is_base %} <span class="badge bg-info ms-1">base</span>{% endif %}</td>
+                <td>{{ c.symbol }}</td>
+                <td>{% if latest %}{{ latest.rate_to_base }}{% else %}—{% endif %}</td>
+                <td>{% if latest %}{{ latest.captured_on }}{% else %}—{% endif %}</td>
+              </tr>
+            {% endwith %}
+          {% empty %}<tr><td colspan="4" class="text-muted text-center">No currencies set.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

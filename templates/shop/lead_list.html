@@ -1,0 +1,42 @@
+{% extends 'shop/base.html' %}
+{% block title %}Intake leads{% endblock %}
+{% block page_title %}Intake leads{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header"><strong>Public intake submissions</strong></div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr><th>When</th><th>Name</th><th>Garment</th><th>Contact</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for l in leads %}
+          <tr id="lead-{{ l.pk }}">
+            <td>{{ l.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ l.name }}</td>
+            <td>{{ l.garment_type }}<br><small class="text-muted">{{ l.fabric }} {{ l.color }}</small></td>
+            <td>
+              {% if l.email %}<div>{{ l.email }}</div>{% endif %}
+              {% if l.phone %}<div>{{ l.phone }}</div>{% endif %}
+            </td>
+            <td><span class="badge-status badge-{{ l.status }}">{{ l.get_status_display }}</span></td>
+            <td class="text-end">
+              {% if l.status == 'new' or l.status == 'contacted' %}
+                <form method="post" action="{% url 'lead_convert' l.pk %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-primary">Convert to order</button>
+                </form>
+              {% elif l.converted_order_id %}
+                <a class="btn btn-sm btn-outline-primary" href="{% url 'order_detail' l.converted_order_id %}">→ Order #{{ l.converted_order_id }}</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-4">No intake submissions yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

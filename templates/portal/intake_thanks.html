@@ -1,0 +1,11 @@
+{% extends 'portal/base.html' %}
+{% block title %}¡Gracias!{% endblock %}
+
+{% block content %}
+<section class="portal-card text-center">
+  <h1>¡Gracias, {{ lead.name|default:'amig@' }}!</h1>
+  <p>Hemos recibido tu consulta sobre <strong>{{ lead.garment_type }}</strong>.</p>
+  <p>Te contactamos pronto para confirmar la cita y un presupuesto.</p>
+  <p><a class="btn btn-primary" href="{% url 'portal_home' %}">Volver al inicio</a></p>
+</section>
+{% endblock %}

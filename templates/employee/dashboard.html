@@ -92,4 +92,34 @@
     {% endfor %}
   </div>
 </div>
+
+<div class="card mt-3" style="margin-top:1.25rem;">
+  <div class="card-header">
+    <span class="card-title"><i class="bi bi-clipboard-data me-1" aria-hidden="true"></i> My material requests</span>
+    <a href="{% url 'emp_request_create' %}" class="btn btn-primary btn-sm">+ New request</a>
+  </div>
+  {% if my_requests %}
+  <div style="overflow-x:auto;">
+    <table>
+      <thead><tr><th>Material</th><th>Qty</th><th>Status</th><th>When</th></tr></thead>
+      <tbody>
+        {% for r in my_requests %}
+          <tr>
+            <td>{{ r.material.name }}{% if r.material.color %} — {{ r.material.color }}{% endif %}</td>
+            <td>{{ r.quantity }} {{ r.material.default_unit }}</td>
+            <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+            <td>{{ r.created_at|date:"M d, H:i" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p style="color:var(--muted);padding:1rem;text-align:center;">No requests yet. Use the button above when you need supplies.</p>
+  {% endif %}
+</div>
+
+<div style="margin-top:1.25rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+  <a href="{% url 'emp_scan' %}" class="btn btn-outline btn-sm"><i class="bi bi-qr-code-scan me-1" aria-hidden="true"></i>Scan ticket</a>
+</div>
 {% endblock %}

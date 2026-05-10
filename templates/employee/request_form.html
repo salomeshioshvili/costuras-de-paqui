@@ -1,0 +1,31 @@
+{% extends 'employee/base.html' %}
+{% block title %}Solicitar material{% endblock %}
+
+{% block content %}
+<div class="emp-card">
+  <h1>Solicitar material al admin</h1>
+  <form method="post" class="emp-form">
+    {% csrf_token %}
+    <label>Material
+      <select name="material" class="form-select" required>
+        <option value="">Selecciona…</option>
+        {% for m in materials %}
+          <option value="{{ m.pk }}">{{ m.name }}{% if m.color %} — {{ m.color }}{% endif %} (stock: {{ m.stock_on_hand }})</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Cantidad
+      <input type="number" step="0.01" min="0.01" name="quantity" class="form-control" value="1" required>
+    </label>
+    <label>Prioridad
+      <select name="priority" class="form-select">
+        {% for v, l in priority_choices %}<option value="{{ v }}">{{ l }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Motivo
+      <textarea name="reason" rows="3" class="form-control" placeholder="¿Para qué pedido o tarea? ¿Urgente?" required></textarea>
+    </label>
+    <button class="btn btn-primary" type="submit">Enviar solicitud</button>
+  </form>
+</div>
+{% endblock %}

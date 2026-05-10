@@ -1,6 +1,6 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -327,6 +327,32 @@
 
     .divider { border: none; border-top: 1px solid var(--p-border); margin: 2rem 0; }
   </style>
+  <style>
+    /* Helpers used by new portal pages */
+    .portal-card { background:#fff; border:1px solid var(--p-border); border-radius:var(--p-radius); padding:24px; box-shadow:var(--shadow); margin:0 auto; max-width:780px; }
+    .portal-card.text-center { text-align:center; }
+    .portal-form .form-row { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+    .portal-form .form-row.two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .portal-form label { display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color:var(--p-ink); }
+    .portal-form input, .portal-form select, .portal-form textarea {
+      border:1px solid var(--p-border); border-radius:14px; padding:10px 12px; font-size:14px; font-family:inherit;
+      background:#fff; color:var(--p-ink);
+    }
+    .portal-form input:focus, .portal-form select:focus, .portal-form textarea:focus {
+      outline:none; border-color:var(--p-accent); box-shadow:0 0 0 3px rgba(132,94,194,0.15);
+    }
+    .portal-form .btn-primary { background:var(--p-accent); color:#fff; border:none; border-radius:14px; padding:10px 20px; font-weight:700; cursor:pointer; }
+    .portal-form .btn-primary:hover { background:#6b4aa8; }
+    .portal-form .btn-link { background:none; border:none; color:var(--p-accent); padding:10px 12px; cursor:pointer; }
+    .portal-table { width:100%; border-collapse:collapse; font-size:14px; }
+    .portal-table th, .portal-table td { padding:10px 12px; border-bottom:1px solid var(--p-border); text-align:left; }
+    .portal-table th { font-size:11px; text-transform:uppercase; color:#7a7390; }
+    .muted, .portal-card .muted { color:var(--p-muted); font-size:13px; }
+    .text-center { text-align:center; }
+    .small { font-size:12px; }
+    .mt-3 { margin-top:18px; }
+    .portal-card h1, .portal-card h2 { letter-spacing:-0.02em; margin-bottom:10px; }
+  </style>
   {% block extra_css %}{% endblock %}
 </head>
 <body class="cdp-body {% block body_class %}{% endblock %}">
@@ -339,19 +365,49 @@
       Costuras <em>de Paqui</em>
     </a>
     <nav class="cdp-topnav__links" aria-label="Customer">
+      {% if user.is_authenticated %}
+        <form action="{% url 'set_language' %}" method="post" style="display:inline-flex;margin:0;align-items:center;">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <label class="visually-hidden" for="id_language_portal">{% trans "Language" %}</label>
+          <select name="language" id="id_language_portal"
+                  style="padding:0.45rem 0.65rem;border-radius:999px;border:1px solid var(--p-border);font-size:0.82rem;font-weight:600;background:#fff;color:var(--p-ink);"
+                  onchange="this.form.submit()">
+            {% get_current_language as LANG_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% for lang_code, lang_name in LANGUAGES %}
+              <option value="{{ lang_code }}" {% if lang_code == LANG_CODE %}selected{% endif %}>{{ lang_name }}</option>
+            {% endfor %}
+          </select>
+        </form>
+        <form action="{% url 'set_display_currency' %}" method="post" style="display:inline-flex;margin:0;align-items:center;">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <label class="visually-hidden" for="id_currency_portal">{% trans "Display currency" %}</label>
+          <select name="currency" id="id_currency_portal"
+                  style="padding:0.45rem 0.65rem;border-radius:999px;border:1px solid var(--p-border);font-size:0.82rem;font-weight:600;background:#fff;color:var(--p-ink);"
+                  onchange="this.form.submit()">
+            {% for code in display_currency_options %}
+              <option value="{{ code }}" {% if code == display_currency_code %}selected{% endif %}>{{ code }}</option>
+            {% endfor %}
+          </select>
+        </form>
+      {% endif %}
       {% if user.is_authenticated and not user.is_staff %}
-        <a href="{% url 'portal_dashboard' %}">My orders</a>
-        <a href="{% url 'portal_book' %}">Book</a>
-        <a href="{% url 'portal_profile' %}">Profile</a>
-        <a href="{% url 'portal_logout' %}">Sign out</a>
-        <a href="{% url 'portal_book' %}" class="is-cta">New booking</a>
+        <a href="{% url 'portal_dashboard' %}">{% trans "My orders" %}</a>
+        <a href="{% url 'portal_book' %}">{% trans "Book" %}</a>
+        <a href="{% url 'portal_appointments' %}">{% trans "Appointments" %}</a>
+        <a href="{% url 'portal_profile' %}">{% trans "Profile" %}</a>
+        <a href="{% url 'portal_logout' %}">{% trans "Sign out" %}</a>
+        <a href="{% url 'portal_book' %}" class="is-cta">{% trans "New booking" %}</a>
       {% elif user.is_staff %}
-        <a href="{% url 'dashboard' %}">Staff dashboard</a>
-        <a href="{% url 'portal_logout' %}">Sign out</a>
+        <a href="{% url 'dashboard' %}">{% trans "Staff dashboard" %}</a>
+        <a href="{% url 'portal_logout' %}">{% trans "Sign out" %}</a>
       {% else %}
-        <a href="{% url 'portal_home' %}">Home</a>
-        <a href="{% url 'portal_login' %}">Sign in</a>
-        <a href="{% url 'portal_register' %}" class="is-cta">Create account</a>
+        <a href="{% url 'portal_home' %}">{% trans "Home" %}</a>
+        <a href="{% url 'public_intake' %}">{% trans "Quick request" %}</a>
+        <a href="{% url 'portal_login' %}">{% trans "Sign in" %}</a>
+        <a href="{% url 'portal_register' %}" class="is-cta">{% trans "Create account" %}</a>
       {% endif %}
     </nav>
   </header>

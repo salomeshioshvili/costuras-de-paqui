@@ -1,0 +1,555 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-10 01:55+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Please enter a valid due date."
+msgstr ""
+
+msgid "Your due date must be later than today."
+msgstr ""
+
+msgid "The discount or referral code could not be applied to this order."
+msgstr ""
+
+msgid "Please pick a valid date and time."
+msgstr ""
+
+msgid "Appointments must be on a future day, not today or earlier."
+msgstr ""
+
+msgid "Appointments are only available on weekdays."
+msgstr ""
+
+msgid "That time is before the workshop opens."
+msgstr ""
+
+msgid "That time is after the workshop closes."
+msgstr ""
+
+msgid "Your appointment request was submitted."
+msgstr ""
+
+msgid "All notifications marked as read."
+msgstr ""
+
+msgid "Customer site"
+msgstr ""
+
+msgid "Admin"
+msgstr ""
+
+msgid "Sign out"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "My work"
+msgstr ""
+
+msgid "My tickets"
+msgstr ""
+
+msgid "All tickets"
+msgstr ""
+
+msgid "Orders"
+msgstr ""
+
+msgid "Account"
+msgstr ""
+
+msgid "My profile"
+msgstr ""
+
+msgid "System"
+msgstr ""
+
+msgid "Scan ticket"
+msgstr ""
+
+msgid "Point the camera at the ticket QR or enter the code manually."
+msgstr ""
+
+msgid "Ticket code"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Appointments"
+msgstr ""
+
+msgid "Your appointments"
+msgstr ""
+
+msgid "When"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Notes"
+msgstr ""
+
+msgid "You have no appointments yet."
+msgstr ""
+
+msgid "Request a new appointment"
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"    Choose a weekday after today, between %(start)s and the end of the "
+"working day (before %(end)s:00).\n"
+"    "
+msgstr ""
+
+msgid "Fitting"
+msgstr ""
+
+msgid "Alteration"
+msgstr ""
+
+msgid "Pickup"
+msgstr ""
+
+msgid "Initial consultation"
+msgstr ""
+
+msgid "Date and time"
+msgstr ""
+
+msgid "Optional notes"
+msgstr ""
+
+msgid "Submit request"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Display currency"
+msgstr ""
+
+msgid "My orders"
+msgstr ""
+
+msgid "Book"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "New booking"
+msgstr ""
+
+msgid "Staff dashboard"
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "Quick request"
+msgstr ""
+
+msgid "Sign in"
+msgstr ""
+
+msgid "Create account"
+msgstr ""
+
+msgid "Book a Garment"
+msgstr ""
+
+msgid "Book a New Garment"
+msgstr ""
+
+msgid ""
+"Fill in the details below and your order price will be calculated "
+"automatically."
+msgstr ""
+
+msgid ""
+"Your booking is reviewed by our team and priced automatically from garment "
+"details."
+msgstr ""
+
+msgid "Garment type"
+msgstr ""
+
+msgid "Fabric and style"
+msgstr ""
+
+msgid "Fabric / material"
+msgstr ""
+
+msgid "e.g. Silk, Cotton, Linen"
+msgstr ""
+
+msgid "Color"
+msgstr ""
+
+msgid "e.g. Navy Blue, Ivory"
+msgstr ""
+
+msgid "Special instructions / design notes"
+msgstr ""
+
+msgid ""
+"Describe any design details, patterns, embellishments, or special "
+"requirements…"
+msgstr ""
+
+msgid "Scheduling"
+msgstr ""
+
+msgid "Requested due date"
+msgstr ""
+
+msgid "We will confirm if this date is achievable."
+msgstr ""
+
+msgid "Quantity"
+msgstr ""
+
+msgid "Priority"
+msgstr ""
+
+msgid "Normal"
+msgstr ""
+
+msgid "High"
+msgstr ""
+
+msgid "Urgent"
+msgstr ""
+
+msgid "Reference image (optional)"
+msgstr ""
+
+msgid "A photo, sketch or screenshot of the look you want."
+msgstr ""
+
+msgid "Discount or referral code"
+msgstr ""
+
+msgid "e.g. CDP-AB12CD or NEW10"
+msgstr ""
+
+msgid "Enter a code shared by another customer or staff to apply a discount."
+msgstr ""
+
+msgid "Submit booking"
+msgstr ""
+
+msgid "My dashboard"
+msgstr ""
+
+#, python-format
+msgid "Hello, %(name)s"
+msgstr ""
+
+msgid "Your orders and bookings, clearly laid out."
+msgstr ""
+
+msgid "Active orders"
+msgstr ""
+
+msgid "With the workshop"
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
+msgid "Delivered or closed"
+msgstr ""
+
+msgid "All orders"
+msgstr ""
+
+msgid "Lifetime total"
+msgstr ""
+
+msgid "Book a garment"
+msgstr ""
+
+#, python-format
+msgid "Order #%(n)s"
+msgstr ""
+
+msgid "Placed"
+msgstr ""
+
+msgid "Due"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "No active orders"
+msgstr ""
+
+msgid "Book your first garment to see it here."
+msgstr ""
+
+msgid "Book now"
+msgstr ""
+
+msgid "Completed and delivered"
+msgstr ""
+
+msgid "Create a new identical order"
+msgstr ""
+
+msgid "Reorder"
+msgstr ""
+
+msgid "Save as a reusable template"
+msgstr ""
+
+msgid "Save template"
+msgstr ""
+
+msgid "Saved templates"
+msgstr ""
+
+msgid "Book from template"
+msgstr ""
+
+msgid "Upcoming due dates"
+msgstr ""
+
+msgid "No due dates on active orders."
+msgstr ""
+
+msgid "Manage"
+msgstr ""
+
+msgid "Back to dashboard"
+msgstr ""
+
+msgid "Order date"
+msgstr ""
+
+msgid "Due date"
+msgstr ""
+
+msgid "TBD"
+msgstr ""
+
+msgid "Payment"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"              Booked as %(sym)s%(amt)s (%(code)s)\n"
+"              "
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"            Booked as €%(amt)s (EUR)\n"
+"            "
+msgstr ""
+
+msgid "Pending quote"
+msgstr ""
+
+msgid "Balance"
+msgstr ""
+
+msgid "Outstanding balance"
+msgstr ""
+
+msgid "Remaining balance"
+msgstr ""
+
+msgid "Pay now"
+msgstr ""
+
+#, python-format
+msgid "Pay order #%(n)s"
+msgstr ""
+
+msgid "Amount due"
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"    Charge recorded in %(code)s at the amount you enter below.\n"
+"    "
+msgstr ""
+
+msgid "Amount to pay"
+msgstr ""
+
+msgid "Method"
+msgstr ""
+
+msgid "Card"
+msgstr ""
+
+msgid "Bank transfer"
+msgstr ""
+
+msgid "Cash"
+msgstr ""
+
+msgid "Mobile payment"
+msgstr ""
+
+msgid "Confirm payment"
+msgstr ""
+
+msgid "Back to order"
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"    About %(approx)s in your selected display currency for reference only.\n"
+"    "
+msgstr ""
+
+msgid ""
+"Payments are recorded in your order currency. The amount field uses that "
+"currency."
+msgstr ""
+
+msgid "Receipt"
+msgstr ""
+
+msgid "RECEIPT"
+msgstr ""
+
+msgid "Customer"
+msgstr ""
+
+msgid "Payment received"
+msgstr ""
+
+msgid "Order"
+msgstr ""
+
+msgid "Stage"
+msgstr ""
+
+msgid "Amount (booking currency)"
+msgstr ""
+
+#, python-format
+msgid "Approximate amount (%(code)s, display only)"
+msgstr ""
+
+msgid "Reference"
+msgstr ""
+
+msgid "Thank you for choosing Costuras de Paqui."
+msgstr ""
+
+msgid "Main"
+msgstr ""
+
+msgid "Operations"
+msgstr ""
+
+msgid "Customers"
+msgstr ""
+
+msgid "Work tickets"
+msgstr ""
+
+msgid "Calendar"
+msgstr ""
+
+msgid "Inventory"
+msgstr ""
+
+msgid "Stock and suppliers"
+msgstr ""
+
+msgid "Materials"
+msgstr ""
+
+msgid "Material requests"
+msgstr ""
+
+msgid "Customer experience"
+msgstr ""
+
+msgid "Intake leads"
+msgstr ""
+
+msgid "Pricing and FX"
+msgstr ""
+
+msgid "Notifications"
+msgstr ""
+
+msgid "Team"
+msgstr ""
+
+msgid "Employees"
+msgstr ""
+
+msgid "Insights"
+msgstr ""
+
+msgid "Reports"
+msgstr ""
+
+msgid "Search orders, customers, tickets, materials, leads…"
+msgstr ""
+
+msgid "In:"
+msgstr ""
+
+msgid "Tickets"
+msgstr ""
+
+msgid "Leads"
+msgstr ""
+
+msgid "Mark all as read"
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "No notifications yet."
+msgstr ""
+
+msgid ""
+"Changes here affect new bookings only. Totals on existing orders stay as "
+"agreed."
+msgstr ""

@@ -5,3 +5,11 @@ dj-database-url>=2.2.0
 whitenoise>=6.7.0
 gunicorn>=21.2.0
 psycopg2-binary>=2.9.9
+
+# Optional pluggable providers — install only when you want the live channel.
+# All have console/stub fallbacks if missing or unconfigured.
+qrcode>=7.4
+Pillow>=10.0
+# stripe>=7.0
+# twilio>=8.10
+# requests>=2.31

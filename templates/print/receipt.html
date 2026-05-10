@@ -1,0 +1,34 @@
+{% extends 'print/_shared.html' %}
+{% load i18n workflow_tags %}
+{% block title %}{% trans "Receipt" %} {{ receipt.number }}{% endblock %}
+{% block doc_kind %}{% trans "RECEIPT" %}{% endblock %}
+{% block doc_number %}{{ receipt.number }} · {{ receipt.issued_at|date:"Y-m-d H:i" }}{% endblock %}
+
+{% block content %}
+<h2>{% trans "Customer" %}</h2>
+<div>
+  <strong>{{ order.customer.full_name }}</strong><br>
+  {{ order.customer.email|default:'' }}
+</div>
+
+<h2>{% trans "Payment received" %}</h2>
+<table>
+  <tr><td>{% trans "Order" %}</td><td>#{{ order.pk }}</td></tr>
+  <tr><td>{% trans "Method" %}</td><td>{{ payment.get_payment_method_display }}</td></tr>
+  <tr><td>{% trans "Stage" %}</td><td>{{ payment.get_payment_stage_display }}</td></tr>
+  <tr><td>{% trans "Amount (booking currency)" %}</td><td><strong>{{ payment.amount|money:currency_code }}</strong></td></tr>
+  {% if display_currency_code and display_payment_formatted %}
+    <tr>
+      <td>{% blocktrans with code=display_currency_code %}Approximate amount ({{ code }}, display only){% endblocktrans %}</td>
+      <td><strong>{{ display_payment_formatted }}</strong></td>
+    </tr>
+  {% endif %}
+  {% if payment.reference_code %}
+    <tr><td>{% trans "Reference" %}</td><td>{{ payment.reference_code }}</td></tr>
+  {% endif %}
+</table>
+
+<div class="meta">
+  {% trans "Thank you for choosing Costuras de Paqui." %}
+</div>
+{% endblock %}

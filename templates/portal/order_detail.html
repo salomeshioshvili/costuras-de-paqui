@@ -1,5 +1,6 @@
 {% extends 'portal/base.html' %}
-{% block title %}Order #{{ order.pk }}{% endblock %}
+{% load i18n workflow_tags %}
+{% block title %}{% blocktrans with n=order.pk %}Order #{{ n }}{% endblocktrans %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -20,7 +21,6 @@
   .meta-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.3rem; }
   .meta-val { font-weight: 600; font-size: 0.95rem; }
 
-  /* TIMELINE */
   .timeline { position: relative; padding-left: 2rem; }
   .timeline::before { content: ''; position: absolute; left: 0.55rem; top: 0.5rem; bottom: 0.5rem; width: 2px; background: var(--border); }
   .tl-item { position: relative; margin-bottom: 1.25rem; }
@@ -39,7 +39,6 @@
   .tl-stage { font-weight: 600; font-size: 0.9rem; }
   .tl-time { font-size: 0.78rem; color: var(--muted); }
 
-  /* GARMENT CARD */
   .garment-card { border: 1px solid var(--border); border-radius: 16px; margin-bottom: 1rem; overflow: hidden; }
   .garment-header { background: var(--cream); padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
   .garment-name { font-weight: 600; font-size: 0.95rem; }
@@ -65,41 +64,85 @@
 {% endblock %}
 
 {% block content %}
-<a href="{% url 'portal_dashboard' %}" class="back-link">← Back to Dashboard</a>
+<a href="{% url 'portal_dashboard' %}" class="back-link">{% trans "Back to dashboard" %}</a>
 
 <div class="order-hero">
   <div>
-    <h1>Order #{{ order.pk }}</h1>
-    <p>Placed {{ order.order_date|date:"F j, Y" }}</p>
+    <h1>{% blocktrans with n=order.pk %}Order #{{ n }}{% endblocktrans %}</h1>
+    <p>{% trans "Placed" %} {{ order.order_date|date:"F j, Y" }}</p>
   </div>
   <span class="badge badge-{{ order.status }}" style="font-size:0.85rem;padding:0.4rem 1rem;">{{ order.get_status_display }}</span>
 </div>
 
-<!-- META -->
 <div class="meta-grid">
   <div class="meta-box">
-    <div class="meta-label">Order Date</div>
+    <div class="meta-label">{% trans "Order date" %}</div>
     <div class="meta-val">{{ order.order_date|date:"M d, Y" }}</div>
   </div>
   <div class="meta-box">
-    <div class="meta-label">Due Date</div>
-    <div class="meta-val">{% if order.due_date %}{{ order.due_date|date:"M d, Y" }}{% else %}TBD{% endif %}</div>
+    <div class="meta-label">{% trans "Due date" %}</div>
+    <div class="meta-val">{% if order.due_date %}{{ order.due_date|date:"M d, Y" }}{% else %}{% trans "TBD" %}{% endif %}</div>
   </div>
   <div class="meta-box">
-    <div class="meta-label">Priority</div>
+    <div class="meta-label">{% trans "Priority" %}</div>
     <div class="meta-val">{{ order.get_priority_display }}</div>
   </div>
   <div class="meta-box">
-    <div class="meta-label">Payment</div>
+    <div class="meta-label">{% trans "Payment" %}</div>
     <div class="meta-val">{{ order.get_payment_status_display }}</div>
   </div>
   <div class="meta-box">
-    <div class="meta-label">Total</div>
-    <div class="meta-val">{% if order.final_amount %}EUR {{ order.final_amount }}{% else %}Pending quote{% endif %}</div>
+    <div class="meta-label">{% trans "Total" %}</div>
+    <div class="meta-val">
+      {% if order.final_amount %}
+        {% order_money_display order order.final_amount %}
+        {% if order.currency %}
+          {% if display_currency_code != order.currency.code %}
+            <div class="small text-muted" style="margin-top:0.35rem;">
+              {% blocktrans with sym=order.currency.symbol amt=order.final_amount code=order.currency.code %}
+              Booked as {{ sym }}{{ amt }} ({{ code }})
+              {% endblocktrans %}
+            </div>
+          {% endif %}
+        {% elif display_currency_code != 'EUR' %}
+          <div class="small text-muted" style="margin-top:0.35rem;">
+            {% blocktrans with amt=order.final_amount %}
+            Booked as €{{ amt }} (EUR)
+            {% endblocktrans %}
+          </div>
+        {% endif %}
+      {% else %}
+        {% trans "Pending quote" %}
+      {% endif %}
+    </div>
+  </div>
+  <div class="meta-box">
+    <div class="meta-label">{% trans "Balance" %}</div>
+    <div class="meta-val {% if balance > 0 %}text-danger{% else %}text-success{% endif %}">{% order_money_display order balance %}</div>
   </div>
 </div>
 
-<!-- DELIVERY CONFIRMATION -->
+{% if balance > 0 and order.status != 'cancelled' %}
+<div class="delivery-banner" style="background:#fff8f0;border-color:#f7d8b0;">
+  <span class="icon" style="color:#856404;" aria-hidden="true"><i class="bi bi-credit-card-2-front"></i></span>
+  <div style="flex:1;">
+    <h3 style="color:#856404;">{% trans "Outstanding balance" %}</h3>
+    <p>{% trans "Remaining balance" %}: {% order_money_display order balance %}</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'portal_pay_order' order.pk %}"><i class="bi bi-credit-card me-1" aria-hidden="true"></i>{% trans "Pay now" %}</a>
+</div>
+{% endif %}
+
+<div class="meta-grid">
+  <div class="meta-box" style="grid-column:span 2;">
+    <div class="meta-label">Documents</div>
+    <a href="{% url 'portal_invoice' order.pk %}?lang={{ order.customer.language }}" class="btn btn-outline btn-sm" target="_blank"><i class="bi bi-file-earmark-text"></i> Invoice</a>
+    {% for p in payments %}
+      <a href="{% url 'payment_receipt' p.pk %}" class="btn btn-outline btn-sm" target="_blank">Receipt #{{ p.pk }}</a>
+    {% endfor %}
+  </div>
+</div>
+
 {% if delivery and delivery.is_delivered %}
 <div class="delivery-banner">
   <span class="icon" aria-hidden="true"><i class="bi bi-check-circle-fill"></i></span>
@@ -118,7 +161,6 @@
 </div>
 {% endif %}
 
-<!-- GARMENTS -->
 <div class="card">
   <div class="card-header">
     <span class="card-title">Garments ({{ items.count }})</span>
@@ -139,7 +181,6 @@
       {% endif %}
     </div>
 
-    <!-- Production Timeline -->
     {% if item.tickets.all %}
     <div style="padding:1.25rem;border-top:1px solid var(--border);">
       <div style="font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;">Production Progress</div>
@@ -166,10 +207,35 @@
     </div>
     {% else %}
     <div style="padding:1rem 1.25rem;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;">
-      ⏳ Production ticket not yet assigned. Our team will review your booking shortly.
+      Production ticket not yet assigned. Our team will review your booking shortly.
+    </div>
+    {% endif %}
+
+    {% if item.attachments.all %}
+    <div style="padding:1rem 1.25rem;border-top:1px solid var(--border);">
+      <div style="font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.5rem;">Photos</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+        {% for att in item.attachments.all %}
+          <a href="{{ att.file.url }}" target="_blank" rel="noopener" title="{{ att.get_kind_display }}: {{ att.caption }}">
+            <img src="{{ att.file.url }}" alt="{{ att.caption }}" style="height:80px;width:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">
+          </a>
+        {% endfor %}
+      </div>
     </div>
     {% endif %}
   </div>
   {% endfor %}
+</div>
+
+<div class="card mt-3" style="margin-top:1rem;">
+  <div class="card-header"><span class="card-title">Add a reference image</span></div>
+  <div style="padding:1rem 1.25rem;">
+    <form method="post" action="{% url 'attachment_upload' 'reference' 'order' order.pk %}" enctype="multipart/form-data" style="display:flex;gap:0.5rem;align-items:center;">
+      {% csrf_token %}
+      <input type="file" name="file" accept="image/*" required>
+      <input type="text" name="caption" placeholder="Optional caption" class="form-control">
+      <button type="submit" class="btn btn-primary btn-sm">Upload</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'portal/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Appointments" %}{% endblock %}
+
+{% block content %}
+<section class="portal-card">
+  <h1>{% trans "Your appointments" %}</h1>
+  <table class="portal-table">
+    <thead><tr><th>{% trans "When" %}</th><th>{% trans "Type" %}</th><th>{% trans "Status" %}</th><th>{% trans "Notes" %}</th></tr></thead>
+    <tbody>
+      {% for a in appointments %}
+        <tr>
+          <td>{{ a.scheduled_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ a.get_kind_display }}</td>
+          <td>{{ a.get_status_display }}</td>
+          <td>{{ a.notes|truncatewords:14 }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="text-center muted">{% trans "You have no appointments yet." %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="portal-card mt-3">
+  <h2>{% trans "Request a new appointment" %}</h2>
+  <p class="muted small" style="margin-bottom:1rem;">
+    {% blocktrans with start=appointment_min_local|time:"H:i" end=appointment_end_hour %}
+    Choose a weekday after today, between {{ start }} and the end of the working day (before {{ end }}:00).
+    {% endblocktrans %}
+  </p>
+  <form method="post" class="portal-form">
+    {% csrf_token %}
+    <div class="form-row two">
+      <label>{% trans "Type" %}
+        <select name="kind">
+          <option value="fitting">{% trans "Fitting" %}</option>
+          <option value="alteration">{% trans "Alteration" %}</option>
+          <option value="pickup">{% trans "Pickup" %}</option>
+          <option value="intake">{% trans "Initial consultation" %}</option>
+        </select>
+      </label>
+      <label>{% trans "Date and time" %}
+        <input type="datetime-local" name="scheduled_at" required
+               min="{{ appointment_min_local|date:'Y-m-d' }}T{{ appointment_min_local|time:'H:i' }}">
+      </label>
+    </div>
+    <div class="form-row">
+      <label>{% trans "Optional notes" %}
+        <textarea name="notes" rows="3"></textarea>
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary">{% trans "Submit request" %}</button>
+  </form>
+</section>
+{% endblock %}

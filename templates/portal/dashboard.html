@@ -1,5 +1,6 @@
 {% extends 'portal/base.html' %}
-{% block title %}My Dashboard{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "My dashboard" %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -50,108 +51,157 @@
 <div class="cust-dash">
 <div>
 <div class="cdp-dash-intro">
-  <h1>Hello, {{ customer.first_name }}</h1>
-  <p>Your orders and bookings, clearly laid out.</p>
+  <h1>{% blocktrans with name=customer.first_name %}Hello, {{ name }}{% endblocktrans %}</h1>
+  <p>{% trans "Your orders and bookings, clearly laid out." %}</p>
   <p class="text-secondary small mb-0" style="font-size:0.82rem;color:var(--p-muted) !important;">{% now "l, F j" %}</p>
 </div>
 
 <div class="cdp-metric-grid">
   <div class="cdp-metric-card cdp-metric-card--lemon">
     <i class="cdp-metric-card__icon bi bi-hourglass-split" aria-hidden="true"></i>
-    <div class="cdp-metric-card__label">Active orders</div>
+    <div class="cdp-metric-card__label">{% trans "Active orders" %}</div>
     <div class="cdp-metric-card__value">{{ active_orders.count }}</div>
-    <div class="cdp-metric-card__hint">With the workshop</div>
+    <div class="cdp-metric-card__hint">{% trans "With the workshop" %}</div>
   </div>
   <div class="cdp-metric-card cdp-metric-card--mint">
     <i class="cdp-metric-card__icon bi bi-check2-circle" aria-hidden="true"></i>
-    <div class="cdp-metric-card__label">Completed</div>
+    <div class="cdp-metric-card__label">{% trans "Completed" %}</div>
     <div class="cdp-metric-card__value">{{ completed_orders.count }}</div>
-    <div class="cdp-metric-card__hint">Delivered or closed</div>
+    <div class="cdp-metric-card__hint">{% trans "Delivered or closed" %}</div>
   </div>
   <div class="cdp-metric-card cdp-metric-card--sky">
     <i class="cdp-metric-card__icon bi bi-stack" aria-hidden="true"></i>
-    <div class="cdp-metric-card__label">All orders</div>
+    <div class="cdp-metric-card__label">{% trans "All orders" %}</div>
     <div class="cdp-metric-card__value">{{ active_orders.count|add:completed_orders.count }}</div>
-    <div class="cdp-metric-card__hint">Lifetime total</div>
+    <div class="cdp-metric-card__hint">{% trans "Lifetime total" %}</div>
   </div>
 </div>
 
 <div style="margin-bottom:2rem;">
-  <a href="{% url 'portal_book' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Book a garment</a>
+  <a href="{% url 'portal_book' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i> {% trans "Book a garment" %}</a>
 </div>
 
-<!-- ACTIVE ORDERS -->
 <div class="card">
   <div class="card-header">
-    <span class="card-title">Active orders</span>
+    <span class="card-title">{% trans "Active orders" %}</span>
   </div>
   {% if active_orders %}
     {% for order in active_orders %}
     <div class="order-row">
       <div>
-        <div class="order-id">Order #{{ order.pk }}</div>
+        <div class="order-id">{% blocktrans with n=order.pk %}Order #{{ n }}{% endblocktrans %}</div>
         <div class="order-meta">
-          Placed {{ order.order_date|date:"M d, Y" }}
+          {% trans "Placed" %} {{ order.order_date|date:"M d, Y" }}
           &nbsp;·&nbsp;
           {{ order.items.count }} garment{{ order.items.count|pluralize }}
           {% if order.due_date %}
-            &nbsp;·&nbsp; Due {{ order.due_date|date:"M d, Y" }}
+            &nbsp;·&nbsp; {% trans "Due" %} {{ order.due_date|date:"M d, Y" }}
           {% endif %}
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:1rem;">
         <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
-        <a href="{% url 'portal_order_detail' order.pk %}" class="btn btn-outline btn-sm">View <i class="bi bi-arrow-right-short" style="vertical-align:-0.1em" aria-hidden="true"></i></a>
+        <a href="{% url 'portal_order_detail' order.pk %}" class="btn btn-outline btn-sm">{% trans "View" %} <i class="bi bi-arrow-right-short" style="vertical-align:-0.1em" aria-hidden="true"></i></a>
       </div>
     </div>
     {% endfor %}
   {% else %}
     <div class="empty-state">
       <div class="empty-ico"><i class="bi bi-inbox" aria-hidden="true"></i></div>
-      <h3>No active orders</h3>
-      <p>Book your first garment to see it here.</p>
-      <a href="{% url 'portal_book' %}" class="btn btn-primary">Book now</a>
+      <h3>{% trans "No active orders" %}</h3>
+      <p>{% trans "Book your first garment to see it here." %}</p>
+      <a href="{% url 'portal_book' %}" class="btn btn-primary">{% trans "Book now" %}</a>
     </div>
   {% endif %}
 </div>
 
-<!-- COMPLETED ORDERS -->
 {% if completed_orders %}
 <div class="card">
   <div class="card-header">
-    <span class="card-title">Completed &amp; delivered</span>
+    <span class="card-title">{% trans "Completed and delivered" %}</span>
   </div>
   {% for order in completed_orders %}
   <div class="order-row">
     <div>
-      <div class="order-id">Order #{{ order.pk }}</div>
+      <div class="order-id">{% blocktrans with n=order.pk %}Order #{{ n }}{% endblocktrans %}</div>
       <div class="order-meta">
-        Placed {{ order.order_date|date:"M d, Y" }}
+        {% trans "Placed" %} {{ order.order_date|date:"M d, Y" }}
         &nbsp;·&nbsp; {{ order.items.count }} garment{{ order.items.count|pluralize }}
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:1rem;">
+    <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
       <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
-      <a href="{% url 'portal_order_detail' order.pk %}" class="btn btn-outline btn-sm">View <i class="bi bi-arrow-right-short" style="vertical-align:-0.1em" aria-hidden="true"></i></a>
+      <a href="{% url 'portal_order_detail' order.pk %}" class="btn btn-outline btn-sm">{% trans "View" %}</a>
+      <form method="post" action="{% url 'portal_reorder' order.pk %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline btn-sm" title="{% trans 'Create a new identical order' %}">
+          <i class="bi bi-arrow-repeat" aria-hidden="true"></i> {% trans "Reorder" %}
+        </button>
+      </form>
+      <form method="post" action="{% url 'portal_save_template' order.pk %}" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="name" value="From order #{{ order.pk }}">
+        <button type="submit" class="btn btn-outline btn-sm" title="{% trans 'Save as a reusable template' %}">
+          <i class="bi bi-bookmark" aria-hidden="true"></i> {% trans "Save template" %}
+        </button>
+      </form>
     </div>
   </div>
   {% endfor %}
 </div>
 {% endif %}
+
+{% if templates %}
+<div class="card">
+  <div class="card-header"><span class="card-title">{% trans "Saved templates" %}</span></div>
+  {% for t in templates %}
+    <div class="order-row">
+      <div>
+        <div class="order-id">{{ t.name }}</div>
+        <div class="order-meta">{{ t.snapshot.items|length }} garment{{ t.snapshot.items|length|pluralize }} · saved {{ t.created_at|date:"M d, Y" }}</div>
+      </div>
+      <form method="post" action="{% url 'portal_template_use' t.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline btn-sm">{% trans "Book from template" %}</button>
+      </form>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
 </div>
 <aside class="cust-rail">
-  <h3>Upcoming due dates</h3>
+  <h3>{% trans "Upcoming due dates" %}</h3>
   {% if upcoming_orders %}
     {% for order in upcoming_orders %}
     <div class="cust-rail-item">
       <div class="cust-rail-item__d">{{ order.due_date|date:"M j, Y" }}</div>
-      <div class="cust-rail-item__t"><a href="{% url 'portal_order_detail' order.pk %}" style="color:inherit;text-decoration:none;">Order #{{ order.pk }}</a></div>
+      <div class="cust-rail-item__t"><a href="{% url 'portal_order_detail' order.pk %}" style="color:inherit;text-decoration:none;">{% blocktrans with n=order.pk %}Order #{{ n }}{% endblocktrans %}</a></div>
       <div class="order-meta">{{ order.get_status_display }}</div>
     </div>
     {% endfor %}
   {% else %}
-    <p class="small text-muted mb-0">No due dates on active orders.</p>
+    <p class="small text-muted mb-0">{% trans "No due dates on active orders." %}</p>
   {% endif %}
+
+  <h3 style="margin-top:1.25rem;">{% trans "Appointments" %}</h3>
+  {% if appointments %}
+    {% for a in appointments %}
+    <div class="cust-rail-item">
+      <div class="cust-rail-item__d">{{ a.scheduled_at|date:"M j · H:i" }}</div>
+      <div class="cust-rail-item__t">{{ a.get_kind_display }}</div>
+      <div class="order-meta">{{ a.get_status_display }}</div>
+    </div>
+    {% endfor %}
+    <p class="small mt-2"><a href="{% url 'portal_appointments' %}">{% trans "Manage" %} →</a></p>
+  {% else %}
+    <p class="small text-muted mb-0">No appointments scheduled. <a href="{% url 'portal_appointments' %}">Request one →</a></p>
+  {% endif %}
+
+  <h3 style="margin-top:1.25rem;">Your referral code</h3>
+  <div class="cust-rail-item">
+    <div class="cust-rail-item__t" style="font-family:monospace;letter-spacing:0.06em;">{{ customer.referral_code }}</div>
+    <div class="order-meta">Friends get a discount, you earn loyalty.</div>
+  </div>
 </aside>
 </div>
 {% endblock %}

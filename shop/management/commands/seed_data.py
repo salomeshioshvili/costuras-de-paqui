@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from django.utils import timezone
 from datetime import date, timedelta
 from decimal import Decimal
 from shop.models import (
@@ -18,7 +17,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if ProductionStage.objects.exists():
-            self.stdout.write('Demo data already exists — backfilling missing customer/employee user links only.')
+            self.stdout.write('Demo data already exists; backfilling missing customer or employee user links only.')
             self._backfill_user_links()
             return
         self.stdout.write('Seeding demo data...')
@@ -196,7 +195,7 @@ class Command(BaseCommand):
                 final_amount=Decimal('320.00'),
                 payment_option='partial_payments',
                 payment_status='partially_paid',
-                notes='Evening gown, URGENT — event on Saturday.',
+                notes='Evening gown; URGENT: event on Saturday.',
                 created_by=admin
             )
             item3 = OrderItem.objects.create(

@@ -1,5 +1,3 @@
-/* Costuras de Paqui — shared playful-modern layer */
-
 :root {
   --cdp-ink: #1e1b2e;
   --cdp-ink-soft: #3d3658;
@@ -20,7 +18,6 @@
   --cdp-font: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
-/* --- Dashboard metric grid (inspired by modern admin dashboards) --- */
 .cdp-dash-intro {
   margin-bottom: 1.5rem;
 }
@@ -39,7 +36,6 @@
   font-size: 0.92rem;
 }
 
-/* Workshop greet (staff dashboard) — shared typography with inner pages */
 .wd-greet h1 {
   font-size: clamp(1.45rem, 2.8vw, 1.85rem);
   font-weight: 800;
@@ -60,7 +56,6 @@
   font-weight: 600;
 }
 
-/* Inner workshop pages — same voice as dashboard greet */
 .workshop-page-intro {
   margin-bottom: 1.35rem;
 }
@@ -109,7 +104,6 @@
   box-shadow: 0 10px 32px rgba(44, 40, 57, 0.09);
 }
 
-/* Watermark icon (Bootstrap Icons); replaces emoji decor */
 .cdp-metric-card__icon {
   position: absolute;
   right: 0.85rem;
@@ -156,7 +150,6 @@
   color: rgba(30, 27, 46, 0.55);
 }
 
-/* Flat pastel tiles — clean dashboard reference */
 .cdp-metric-card--lemon {
   background: #ebe4c4;
 }
@@ -181,7 +174,6 @@
   color: var(--cdp-ink-soft);
 }
 
-/* --- Fun footer --- */
 .cdp-footer {
   margin-top: auto;
   background: linear-gradient(180deg, #252230 0%, #1a1824 100%);
@@ -337,7 +329,6 @@
   text-align: center;
 }
 
-/* --- Shop / site management (Bootstrap area) — professional, no marketing footer --- */
 .shop-toolbar {
   display: flex;
   justify-content: space-between;
@@ -372,7 +363,6 @@
   font-weight: 800;
 }
 
-/* Team directory cards on workshop employee list */
 .workshop-team-card {
   border: 1px solid rgba(26, 26, 26, 0.07);
   border-radius: var(--cdp-radius-xl);
@@ -423,7 +413,6 @@
   text-underline-offset: 3px;
 }
 
-/* Employee portal — minimal footer (not customer marketing) */
 .emp-app-footer {
   padding: 10px 1.5rem 16px;
   font-size: 11px;
@@ -432,4 +421,25 @@
   text-align: center;
   border-top: 1px solid rgba(26, 26, 26, 0.08);
   background: rgba(253, 247, 240, 0.92);
+}
+
+.emp-deadline-overdue {
+  color: var(--red, #dc2626);
+}
+.emp-incident-status {
+  font-size: 0.75rem;
+}
+.emp-incident-status--resolved {
+  color: var(--green, #22a06b);
+}
+.emp-incident-status--open {
+  color: var(--red, #dc2626);
+}
+
+.shop-order-balance-credit,
+.shop-order-balance-clear {
+  color: #059669;
+}
+.shop-order-balance-due {
+  color: #dc2626;
 }

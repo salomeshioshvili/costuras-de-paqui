@@ -1,0 +1,89 @@
+{% extends 'shop/base.html' %}
+{% block title %}Inventory{% endblock %}
+{% block page_title %}Inventory{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ materials|length }}</div>
+      <div class="stat-label">Materials tracked</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-value text-danger">{{ low_stock|length }}</div>
+      <div class="stat-label">Low stock items</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ suppliers.count }}</div>
+      <div class="stat-label">Active suppliers</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ pending_orders.count }}</div>
+      <div class="stat-label">Open supplier orders</div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <strong>Low stock</strong>
+    <a href="{% url 'material_create' %}" class="btn btn-sm btn-primary">+ Material</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>Material</th><th>Stock</th><th>Threshold</th><th>Supplier</th><th></th></tr></thead>
+      <tbody>
+        {% for m in low_stock %}
+          <tr class="overdue-row">
+            <td>{{ m.name }} {% if m.color %}<small class="text-muted">{{ m.color }}</small>{% endif %}</td>
+            <td>{{ m.stock_on_hand }} {{ m.default_unit }}</td>
+            <td>{{ m.low_stock_threshold }} {{ m.default_unit }}</td>
+            <td>{{ m.supplier|default:'—' }}</td>
+            <td class="text-end">
+              <form method="post" action="{% url 'supplier_order_create' %}" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="material" value="{{ m.pk }}">
+                <input type="hidden" name="supplier" value="{{ m.supplier.pk|default:'' }}">
+                <input type="hidden" name="quantity" value="{{ m.low_stock_threshold }}">
+                <button type="submit" class="btn btn-sm btn-outline-primary" {% if not m.supplier %}disabled title="No supplier set"{% endif %}>Reorder</button>
+              </form>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="text-center text-muted py-4">All stock levels are healthy.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header"><strong>Open supplier orders</strong></div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead><tr><th>#</th><th>Supplier</th><th>Status</th><th>Total</th><th>Placed</th><th>Expected</th><th></th></tr></thead>
+      <tbody>
+        {% for so in pending_orders %}
+          <tr>
+            <td>SO {{ so.pk }}</td>
+            <td>{{ so.supplier.name }}</td>
+            <td><span class="badge-status badge-{{ so.status }}">{{ so.get_status_display }}</span></td>
+            <td>€{{ so.total }}</td>
+            <td>{{ so.placed_on|default:'—' }}</td>
+            <td>{{ so.expected_on|default:'—' }}</td>
+            <td><a href="{% url 'supplier_order_detail' so.pk %}" class="btn btn-sm btn-outline-primary">Open</a></td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="7" class="text-center text-muted py-3">No open supplier orders.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

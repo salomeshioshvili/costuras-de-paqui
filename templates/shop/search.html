@@ -1,0 +1,87 @@
+{% extends 'shop/base.html' %}
+{% block title %}Search{% endblock %}
+{% block page_title %}Search{% endblock %}
+
+{% block content %}
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="get" class="d-flex gap-2">
+      <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Type a name, email, ticket code, material, lead…" autofocus>
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+    {% if q %}
+      <div class="mt-2 text-muted small">Results for <strong>{{ q }}</strong></div>
+    {% endif %}
+  </div>
+</div>
+
+{% if q %}
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><strong>Customers</strong> <span class="text-muted small">({{ customers|length }})</span></div>
+        <ul class="list-group list-group-flush">
+          {% for c in customers %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <a href="{% url 'customer_detail' c.pk %}">{{ c.full_name }}</a>
+              <span class="text-muted small">{{ c.email }}</span>
+            </li>
+          {% empty %}<li class="list-group-item text-muted">No customers.</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><strong>Orders</strong> <span class="text-muted small">({{ orders|length }})</span></div>
+        <ul class="list-group list-group-flush">
+          {% for o in orders %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <a href="{% url 'order_detail' o.pk %}">Order #{{ o.pk }} — {{ o.customer.full_name }}</a>
+              <span class="badge-status badge-{{ o.status }}">{{ o.get_status_display }}</span>
+            </li>
+          {% empty %}<li class="list-group-item text-muted">No orders.</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><strong>Tickets</strong> <span class="text-muted small">({{ tickets|length }})</span></div>
+        <ul class="list-group list-group-flush">
+          {% for t in tickets %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <a href="{% url 'ticket_detail' t.pk %}">{{ t.ticket_code }}</a>
+              <span class="badge-status badge-{{ t.status }}">{{ t.get_status_display }}</span>
+            </li>
+          {% empty %}<li class="list-group-item text-muted">No tickets.</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><strong>Materials</strong> <span class="text-muted small">({{ materials|length }})</span></div>
+        <ul class="list-group list-group-flush">
+          {% for m in materials %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <a href="{% url 'material_edit' m.pk %}">{{ m.name }} {{ m.color }}</a>
+              <span class="text-muted small">{{ m.stock_on_hand }} {{ m.default_unit }}</span>
+            </li>
+          {% empty %}<li class="list-group-item text-muted">No materials.</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header"><strong>Leads</strong> <span class="text-muted small">({{ leads|length }})</span></div>
+        <ul class="list-group list-group-flush">
+          {% for l in leads %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <a href="{% url 'lead_list' %}#lead-{{ l.pk }}">{{ l.name }} — {{ l.garment_type }}</a>
+              <span class="badge-status badge-{{ l.status }}">{{ l.get_status_display }}</span>
+            </li>
+          {% empty %}<li class="list-group-item text-muted">No leads.</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

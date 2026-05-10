@@ -1,0 +1,47 @@
+{% extends 'print/_shared.html' %}
+{% load workflow_tags %}
+{% block title %}Invoice {{ invoice.number }}{% endblock %}
+{% block doc_kind %}{% if language == 'es' %}FACTURA{% elif language == 'fr' %}FACTURE{% else %}INVOICE{% endif %}{% endblock %}
+{% block doc_number %}{{ invoice.number }} · {{ invoice.issued_at|date:"Y-m-d" }}{% endblock %}
+
+{% block content %}
+<h2>{% if language == 'es' %}Cliente{% elif language == 'fr' %}Client{% else %}Customer{% endif %}</h2>
+<div>
+  <strong>{{ order.customer.full_name }}</strong><br>
+  {{ order.customer.address|linebreaksbr }}<br>
+  {{ order.customer.phone }} {% if order.customer.email %}· {{ order.customer.email }}{% endif %}
+</div>
+
+<h2>{% if language == 'es' %}Detalle{% elif language == 'fr' %}Détail{% else %}Items{% endif %}</h2>
+<table>
+  <thead><tr>
+    <th>{% if language == 'es' %}Prenda{% elif language == 'fr' %}Vêtement{% else %}Garment{% endif %}</th>
+    <th>{% if language == 'es' %}Tela{% elif language == 'fr' %}Tissu{% else %}Fabric{% endif %}</th>
+    <th>Qty</th>
+    <th>{% if language == 'es' %}Precio{% else %}Price{% endif %}</th>
+  </tr></thead>
+  <tbody>
+    {% for item in order.items.all %}
+      <tr>
+        <td>{{ item.garment_type }}{% if item.color %} ({{ item.color }}){% endif %}</td>
+        <td>{{ item.fabric|default:'—' }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.unit_price|money:currency_code }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table class="totals">
+  <tr><td class="label">Subtotal</td><td class="value">{{ order.subtotal_amount|money:currency_code }}</td></tr>
+  {% if order.order_discount_value %}
+    <tr><td class="label">{% if language == 'es' %}Descuento{% else %}Discount{% endif %}</td><td class="value">−{{ order.order_discount_value|money:currency_code }}</td></tr>
+  {% endif %}
+  <tr><td class="label"><strong>Total</strong></td><td class="value"><strong>{{ order.final_amount|money:currency_code }}</strong></td></tr>
+</table>
+
+<div class="meta">
+  Snapshot rate: 1 EUR = {{ order.exchange_rate }} {{ currency_code }} ·
+  Frozen on {{ order.created_at|date:"Y-m-d" }}.
+</div>
+{% endblock %}

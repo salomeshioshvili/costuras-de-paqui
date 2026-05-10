@@ -28,8 +28,6 @@ from .models import (
     OrderItem,
     OrderItemMaterial,
     ProductionStage,
-    TaskAssignment,
-    TicketStatusHistory,
     WorkTicket,
 )
 from .views import (
@@ -44,7 +42,6 @@ from .views import (
     ORDER_STATUS_RECEIVED,
     PAYMENT_STATUS_PAID,
     PAYMENT_STATUS_PARTIALLY_PAID,
-    TICKET_STATUS_BLOCKED,
     TICKET_STATUS_COMPLETED,
 )
 

@@ -56,8 +56,10 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'shop.context_processors.role_and_flags',
             ],
         },
     },
@@ -104,15 +106,68 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = config('LANGUAGE_CODE', default='en')
+TIME_ZONE = config('TIME_ZONE', default='Europe/Madrid')
 USE_I18N = True
 USE_TZ = True
+
+LANGUAGES = [
+    ('es', 'Español'),
+    ('en', 'English'),
+    ('fr', 'Français'),
+]
+
+LOCALE_PATHS = [BASE_DIR / 'locale']
+
+APPOINTMENT_MIN_DAYS_AHEAD = 1
+APPOINTMENT_ALLOWED_WEEKDAYS = (0, 1, 2, 3, 4)
+APPOINTMENT_START_HOUR = 9
+APPOINTMENT_END_HOUR_EXCLUSIVE = 18
+
+BOOKING_MIN_DAYS_AHEAD = 1
+
+# ─── Provider configuration (all optional; missing keys → console stub) ────
+SMTP_HOST = config('SMTP_HOST', default='')
+EMAIL_HOST = SMTP_HOST
+EMAIL_PORT = config('SMTP_PORT', default=587, cast=int)
+EMAIL_HOST_USER = config('SMTP_USER', default='')
+EMAIL_HOST_PASSWORD = config('SMTP_PASSWORD', default='')
+EMAIL_USE_TLS = config('SMTP_TLS', default=True, cast=bool)
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='no-reply@costurasdepaqui.es')
+EMAIL_BACKEND = (
+    'django.core.mail.backends.smtp.EmailBackend' if SMTP_HOST
+    else 'django.core.mail.backends.console.EmailBackend'
+)
+
+TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN', default='')
+TWILIO_FROM_NUMBER = config('TWILIO_FROM_NUMBER', default='')
+TWILIO_WHATSAPP_FROM = config('TWILIO_WHATSAPP_FROM', default='')
+
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
+STRIPE_PUBLIC_KEY = config('STRIPE_PUBLIC_KEY', default='')
+STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='')
+
+EXCHANGE_RATE_API_URL = config('EXCHANGE_RATE_API_URL', default='')
+
+# ─── Cache (FX cache + small per-view caches) ────────────────────────────
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'sewingshop',
+    }
+}
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# In tests we avoid failing manifest lookups when collectstatic has not run,
+# so we use non-manifest static storage while tests run.
+import sys as _sys
+if 'test' in _sys.argv:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -239,14 +294,65 @@ UNFOLD = {
                 ],
             },
             {
+                "title": "Pricing & FX",
+                "separator": True,
+                "items": [
+                    {"title": "Garment categories", "icon": "category",
+                     "link": "/admin/shop/garmentcategory/"},
+                    {"title": "Fabric types", "icon": "texture",
+                     "link": "/admin/shop/fabrictype/"},
+                    {"title": "Add-ons", "icon": "add_circle",
+                     "link": "/admin/shop/addon/"},
+                    {"title": "Urgency surcharges", "icon": "bolt",
+                     "link": "/admin/shop/urgencysurcharge/"},
+                    {"title": "Discount rules", "icon": "local_offer",
+                     "link": "/admin/shop/discountrule/"},
+                    {"title": "Currencies", "icon": "euro",
+                     "link": "/admin/shop/currency/"},
+                    {"title": "Exchange rates", "icon": "currency_exchange",
+                     "link": "/admin/shop/exchangerate/"},
+                ],
+            },
+            {
+                "title": "Inventory & suppliers",
+                "separator": True,
+                "items": [
+                    {"title": "Materials", "icon": "inventory",
+                     "link": "/admin/shop/material/"},
+                    {"title": "Material requests", "icon": "request_quote",
+                     "link": "/admin/shop/materialrequest/"},
+                    {"title": "Suppliers", "icon": "store",
+                     "link": "/admin/shop/supplier/"},
+                    {"title": "Supplier orders", "icon": "local_mall",
+                     "link": "/admin/shop/supplierorder/"},
+                    {"title": "Storage locations", "icon": "warehouse",
+                     "link": "/admin/shop/storagelocation/"},
+                ],
+            },
+            {
+                "title": "Customer experience",
+                "separator": True,
+                "items": [
+                    {"title": "Appointments", "icon": "event",
+                     "link": "/admin/shop/appointment/"},
+                    {"title": "Intake leads", "icon": "inbox",
+                     "link": "/admin/shop/lead/"},
+                    {"title": "Order templates", "icon": "list_alt",
+                     "link": "/admin/shop/ordertemplate/"},
+                    {"title": "Referral codes", "icon": "loyalty",
+                     "link": "/admin/shop/referralcode/"},
+                    {"title": "Notification log", "icon": "notifications",
+                     "link": "/admin/shop/notificationlog/"},
+                ],
+            },
+            {
                 "title": "System",
                 "separator": True,
                 "items": [
-                    {
-                        "title": "Users",
-                        "icon": "manage_accounts",
-                        "link": "/admin/auth/user/",
-                    },
+                    {"title": "Users", "icon": "manage_accounts",
+                     "link": "/admin/auth/user/"},
+                    {"title": "Audit log", "icon": "policy",
+                     "link": "/admin/shop/auditlog/"},
                 ],
             },
         ],

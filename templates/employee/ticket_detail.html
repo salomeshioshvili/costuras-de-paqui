@@ -24,9 +24,7 @@
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
 
-  <!-- LEFT COLUMN -->
-  <div>
-    <!-- GARMENT INFO -->
+  <div> 
     <div class="card">
       <div class="card-header"><span class="card-title"><i class="bi bi-scissors me-1" aria-hidden="true"></i>Garment details</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
@@ -34,7 +32,7 @@
         {% if ticket.order_item.fabric %}<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Fabric</div><div>{{ ticket.order_item.fabric }}</div></div>{% endif %}
         {% if ticket.order_item.color %}<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Color</div><div>{{ ticket.order_item.color }}</div></div>{% endif %}
         <div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Qty</div><div>{{ ticket.order_item.quantity }}</div></div>
-        {% if ticket.deadline %}<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Deadline</div><div style="{% if ticket.is_overdue %}color:var(--red);{% endif %}">{{ ticket.deadline|date:"M d, Y" }}</div></div>{% endif %}
+        {% if ticket.deadline %}<div><div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.2rem;">Deadline</div><div class="{% if ticket.is_overdue %}emp-deadline-overdue{% endif %}">{{ ticket.deadline|date:"M d, Y" }}</div></div>{% endif %}
       </div>
       {% if ticket.order_item.special_instructions %}
       <div style="margin-top:1rem;padding:0.75rem;background:var(--surface2);border-radius:6px;font-size:0.85rem;color:var(--muted);">
@@ -54,7 +52,6 @@
       {% endif %}
     </div>
 
-    <!-- UPDATE STAGE -->
     {% if ticket.status != 'completed' and ticket.status != 'blocked' %}
     <div class="card">
       <div class="card-header"><span class="card-title"><i class="bi bi-arrow-repeat me-1" aria-hidden="true"></i>Update production stage</span></div>
@@ -78,7 +75,6 @@
       </form>
     </div>
 
-    <!-- MARK COMPLETE -->
     {% if ticket.status == 'in_progress' or ticket.status == 'assigned' %}
     <div class="card" style="border-color:rgba(34,197,94,0.3);">
       <div class="card-header"><span class="card-title"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Mark as completed</span></div>
@@ -101,11 +97,59 @@
       <p style="color:var(--muted);font-size:0.85rem;">This ticket has an unresolved damage incident. Contact your manager to resolve it.</p>
     </div>
     {% endif %}
+
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="bi bi-arrow-right-circle me-1" aria-hidden="true"></i>Allowed next states</span></div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        {% for value, label, reason in next_states %}
+          {% if reason %}
+            <button type="button" class="btn btn-outline btn-sm" disabled title="{{ reason }}">{{ label }} (blocked)</button>
+          {% else %}
+            <form method="post" action="{% url 'ticket_status_update' ticket.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="to" value="{{ value }}">
+              <button type="submit" class="btn btn-primary btn-sm">→ {{ label }}</button>
+            </form>
+          {% endif %}
+        {% empty %}
+          <span style="color:var(--muted);font-size:0.85rem;">No further state changes available.</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title"><i class="bi bi-camera me-1" aria-hidden="true"></i>Progress / final photos</span></div>
+      {% if attachments %}
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.75rem;">
+          {% for att in attachments %}
+            <a href="{{ att.file.url }}" target="_blank" rel="noopener" title="{{ att.get_kind_display }}: {{ att.caption }}">
+              <img src="{{ att.file.url }}" alt="{{ att.caption }}" style="height:80px;width:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);">
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <form method="post" action="{% url 'attachment_upload' 'progress' 'ticket' ticket.pk %}" enctype="multipart/form-data" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+        {% csrf_token %}
+        <input type="file" name="file" accept="image/*" required>
+        <input type="text" name="caption" placeholder="Caption (optional)">
+        <button type="submit" class="btn btn-outline btn-sm">Upload progress</button>
+      </form>
+      <form method="post" action="{% url 'attachment_upload' 'final' 'ticket' ticket.pk %}" enctype="multipart/form-data" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.5rem;">
+        {% csrf_token %}
+        <input type="file" name="file" accept="image/*" required>
+        <input type="text" name="caption" placeholder="Final photo caption">
+        <button type="submit" class="btn btn-outline btn-sm">Upload final</button>
+      </form>
+    </div>
+
+    <div class="card text-center">
+      <div class="card-header"><span class="card-title"><i class="bi bi-qr-code me-1" aria-hidden="true"></i>Ticket QR</span></div>
+      <img src="{{ qr_data_url }}" alt="QR for {{ ticket.ticket_code }}" style="max-width:200px;height:auto;">
+      <div style="font-family:monospace;font-size:0.8rem;color:var(--muted);margin-top:0.5rem;">{{ ticket.qr_payload }}</div>
+    </div>
   </div>
 
-  <!-- RIGHT COLUMN -->
   <div>
-    <!-- PRODUCTION HISTORY -->
     <div class="card">
       <div class="card-header"><span class="card-title"><i class="bi bi-clock-history me-1" aria-hidden="true"></i>Production history</span></div>
       {% if history %}
@@ -130,7 +174,6 @@
       {% endif %}
     </div>
 
-    <!-- DAMAGE INCIDENTS -->
     {% if incidents %}
     <div class="card" style="border-color:rgba(239,68,68,0.3);">
       <div class="card-header"><span class="card-title"><i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>Damage incidents</span></div>
@@ -138,7 +181,7 @@
       <div style="padding:0.75rem;background:var(--surface2);border-radius:6px;margin-bottom:0.75rem;">
         <div style="display:flex;justify-content:space-between;margin-bottom:0.35rem;">
           <span style="font-weight:600;font-size:0.875rem;">{{ inc.get_incident_type_display }}</span>
-          <span style="font-size:0.75rem;color:{% if inc.is_resolved %}var(--green){% else %}var(--red){% endif %};">
+          <span class="emp-incident-status {% if inc.is_resolved %}emp-incident-status--resolved{% else %}emp-incident-status--open{% endif %}">
             {% if inc.is_resolved %}Resolved{% else %}Unresolved{% endif %}
           </span>
         </div>

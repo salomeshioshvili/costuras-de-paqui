@@ -1,0 +1,64 @@
+{% extends 'portal/base.html' %}
+{% block title %}Pide presupuesto{% endblock %}
+
+{% block content %}
+<section class="portal-card">
+  <header>
+    <h1>Pide presupuesto rápido</h1>
+    <p>Cuéntanos tu prenda. Te responderemos para confirmar la cita.</p>
+  </header>
+  <form method="post" enctype="multipart/form-data" class="portal-form">
+    {% csrf_token %}
+    <input type="text" name="hp" value="" style="display:none" tabindex="-1" autocomplete="off">
+
+    <div class="form-row">
+      <label>Nombre completo *
+        <input type="text" name="name" required>
+      </label>
+    </div>
+    <div class="form-row two">
+      <label>Email
+        <input type="email" name="email">
+      </label>
+      <label>Teléfono
+        <input type="tel" name="phone">
+      </label>
+    </div>
+    <div class="form-row two">
+      <label>Tipo de prenda *
+        <input type="text" name="garment_type" required placeholder="Vestido, americana, …">
+      </label>
+      <label>Tela
+        <input type="text" name="fabric" placeholder="Algodón, seda, …">
+      </label>
+    </div>
+    <div class="form-row two">
+      <label>Color
+        <input type="text" name="color">
+      </label>
+      <label>Fecha deseada
+        <input type="date" name="due_date">
+      </label>
+    </div>
+    <div class="form-row">
+      <label>Notas
+        <textarea name="notes" rows="3" placeholder="Talla aproximada, ocasión, ideas, etc."></textarea>
+      </label>
+    </div>
+    <div class="form-row two">
+      <label>Idioma
+        <select name="language">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+          <option value="fr">Français</option>
+        </select>
+      </label>
+      <label>Imagen de referencia
+        <input type="file" name="reference_image" accept="image/*">
+      </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enviar consulta</button>
+  </form>
+</section>
+{% endblock %}
